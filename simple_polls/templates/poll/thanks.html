@@ -1,0 +1,6 @@
+{% extends "/base.html" %}
+{% block title %}Thanks{% endblock %}
+{% block main %}
+<h2>For voting on '{{ poll.title }}'</h2>
+<a href="{{ url_for('home.index') }}">Back Home</a>
+{% endblock %}

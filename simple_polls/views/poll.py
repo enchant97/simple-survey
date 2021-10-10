@@ -50,7 +50,46 @@ async def post_new_poll():
 
 @blueprint.get("/<int:poll_id>")
 async def get_poll(poll_id: int):
-    return await render_template("/poll/view.html")
+    try:
+        poll = await Question.get(id=poll_id)
+        choices = await poll.choices.all()
+        # TODO check if poll is expired
+    except DoesNotExist:
+        abort(404)
+    else:
+        return await render_template("/poll/view.html", poll=poll, choices=choices)
+
+
+@blueprint.post("<int:poll_id>/vote")
+async def post_poll_vote(poll_id: int):
+    try:
+        # TODO check if poll is expired
+        poll = await Question.get(id=poll_id)
+        form = await request.form
+        choice_id = int(form["poll-choice"])
+
+        choice = await Choice.get_or_none(id=choice_id)
+        if choice is None:
+            raise KeyError()
+        choice.votes += 1
+        await choice.save()
+    except (KeyError, ValueError):
+        await flash("Failed to cast vote", "error")
+        return redirect(url_for(".get_poll", poll_id=poll_id))
+    except DoesNotExist:
+        abort(404)
+    else:
+        return redirect(url_for(".get_poll_thanks", poll_id=poll_id))
+
+
+@blueprint.get("<int:poll_id>/thanks")
+async def get_poll_thanks(poll_id: int):
+    try:
+        poll = await Question.get(id=poll_id)
+    except DoesNotExist:
+        abort(404)
+    else:
+        return await render_template("/poll/thanks.html", poll=poll)
 
 
 @blueprint.get("/<int:poll_id>/edit")

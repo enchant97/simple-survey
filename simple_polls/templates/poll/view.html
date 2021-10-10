@@ -1,5 +1,16 @@
 {% extends "/base.html" %}
 {% block title %}View{% endblock %}
 {% block main %}
-
+<form action="{{ url_for('poll.post_poll_vote', poll_id=poll.id) }}" method="post">
+    <h3>{{ poll.title }}</h3>
+    <p>{{ poll.description }}</p>
+    <fieldset>
+        <legend>Poll</legend>
+        {% for choice in choices %}
+        <label for="poll-choice-{{ choice.id }}">{{ choice.caption }}</label>
+        <input type="radio" name="poll-choice" id="poll-choice-{{ choice.id }}" value="{{ choice.id }}">
+        {% endfor %}
+    </fieldset>
+    <button type="submit">Vote</button>
+</form>
 {% endblock %}
