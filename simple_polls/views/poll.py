@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from quart import (Blueprint, abort, flash, redirect, render_template, request,
-                   url_for)
+                   url_for, current_app)
 from tortoise.exceptions import DoesNotExist, ValidationError
 
 from ..database.models import Choice, Question
@@ -82,7 +82,7 @@ async def post_poll_vote(poll_id: int):
         return redirect(url_for(".get_poll_thanks", poll_id=poll_id))
 
 
-@blueprint.get("<int:poll_id>/thanks")
+@blueprint.get("/<int:poll_id>/thanks")
 async def get_poll_thanks(poll_id: int):
     try:
         poll = await Question.get(id=poll_id)
@@ -90,6 +90,33 @@ async def get_poll_thanks(poll_id: int):
         abort(404)
     else:
         return await render_template("/poll/thanks.html", poll=poll)
+
+
+@blueprint.get("/<int:poll_id>/report")
+async def get_poll_report(poll_id: int):
+    try:
+        poll = await Question.get(id=poll_id)
+        choices = await poll.choices.all()
+    except DoesNotExist:
+        abort(404)
+    else:
+        return await render_template("/poll/report.html", poll=poll, choices=choices)
+
+
+@blueprint.get("/<int:poll_id>/report.csv")
+async def get_poll_report_csv(poll_id: int):
+    def generate(choices):
+        yield "Caption, Votes\n"
+        for choice in choices:
+            yield f"'{choice.caption}', {choice.votes}\n"
+    try:
+        poll = await Question.get(id=poll_id)
+        choices = await poll.choices.all()
+        
+    except DoesNotExist:
+        abort(404)
+    else:
+        return current_app.response_class(generate(choices), mimetype="text/csv")
 
 
 @blueprint.get("/<int:poll_id>/edit")

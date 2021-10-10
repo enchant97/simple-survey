@@ -8,6 +8,7 @@
             <th>Expires</th>
             <th></th>
             <th></th>
+            <th></th>
         </tr>
     </thead>
     <tbody>
@@ -16,6 +17,7 @@
             <td>{{ poll.title }}</td>
             <td>{% if poll.expires_at %}{{ poll.expires_at }}{% else %}Never{% endif %}</td>
             <td><a href="{{ url_for('poll.get_poll', poll_id=poll.id) }}">View</a></td>
+            <td><a href="{{ url_for('poll.get_poll_report', poll_id=poll.id) }}">Report</a></td>
             <td><a href="{{ url_for('poll.get_poll_edit', poll_id=poll.id) }}">Edit</a></td>
             <td><a href="{{ url_for('poll.get_poll_delete', poll_id=poll.id) }}">Delete</a></td>
         </tr>
