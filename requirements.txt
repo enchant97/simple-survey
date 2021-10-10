@@ -1,0 +1,2 @@
+quart
+tortoise-orm
