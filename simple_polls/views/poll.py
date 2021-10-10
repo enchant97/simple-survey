@@ -36,3 +36,18 @@ async def post_poll_edit(poll_id: int):
 @blueprint.get("/<int:poll_id>/delete")
 async def get_poll_delete(poll_id: int):
     return redirect(url_for(".get_manage_polls"))
+
+
+@blueprint.get("/<int:poll_id>/choices")
+async def get_manage_choices(poll_id: int):
+    return await render_template("/poll/manage_choice.html")
+
+
+@blueprint.post("/<int:poll_id>/choices/new")
+async def post_manage_choices_new(poll_id: int):
+    return redirect(url_for(".get_manage_choices", poll_id=poll_id))
+
+
+@blueprint.get("/<int:poll_id>/choices/<int:choice_id>/delete")
+async def get_manage_choices_delete(poll_id: int, choice_id: int):
+    return redirect(url_for(".get_manage_choices", poll_id=poll_id, choice_id=choice_id))
