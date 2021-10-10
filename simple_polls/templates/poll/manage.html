@@ -1,5 +1,25 @@
 {% extends "/base.html" %}
 {% block title %}Manage{% endblock %}
 {% block main %}
-
+<table>
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Expires</th>
+            <th></th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for poll in polls %}
+        <tr>
+            <td>{{ poll.title }}</td>
+            <td>{% if poll.expires_at %}{{ poll.expires_at }}{% else %}Never{% endif %}</td>
+            <td><a href="{{ url_for('poll.get_poll', poll_id=poll.id) }}">View</a></td>
+            <td><a href="{{ url_for('poll.get_poll_edit', poll_id=poll.id) }}">Edit</a></td>
+            <td><a href="{{ url_for('poll.get_poll_delete', poll_id=poll.id) }}">Delete</a></td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
 {% endblock %}
