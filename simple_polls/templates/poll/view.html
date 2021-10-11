@@ -4,11 +4,11 @@
 <form action="{{ url_for('poll.post_poll_vote', poll_id=poll.id) }}" method="post">
     <h3>{{ poll.title }}</h3>
     <p>{{ poll.description }}</p>
-    <fieldset>
-        <legend>Poll</legend>
+    <fieldset class="poll-choices">
+        <legend>Select An Option</legend>
         {% for choice in choices %}
+        <input type="radio" name="poll-choice" id="poll-choice-{{ choice.id }}" value="{{ choice.id }}" required>
         <label for="poll-choice-{{ choice.id }}">{{ choice.caption }}</label>
-        <input type="radio" name="poll-choice" id="poll-choice-{{ choice.id }}" value="{{ choice.id }}">
         {% endfor %}
     </fieldset>
     <button type="submit">Vote</button>
