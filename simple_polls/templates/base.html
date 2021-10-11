@@ -4,14 +4,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}{% endblock %} | Simple Polls</title>
+    <title>{% block title %}{% endblock %} | {{ config.TITLE_NAME }}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 
 <body>
     <header>
         <div class="flex-center">
-            <h1>Simple Polls</h1>
+            <h1>{{ config.TITLE_NAME }}</h1>
             <nav>
                 <a href="{{ url_for('home.index') }}">Home</a>
                 <a href="{{ url_for('poll.get_manage_polls') }}">Manage Polls</a>
@@ -21,7 +21,9 @@
         <h2>{{ self.title() }}</h2>
     </header>
     <main>{% block main %}{% endblock %}</main>
-    <footer></footer>
+    <footer>
+        Running Simple Polls, provided by <strong><a href="https://github.com/enchant97">enchant97</a></strong>
+    </footer>
 </body>
 
 </html>

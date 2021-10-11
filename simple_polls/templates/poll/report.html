@@ -1,22 +1,31 @@
 {% extends "/base.html" %}
 {% block title %}{{ poll.title }} - Report{% endblock %}
 {% block main %}
-<a href="{{ url_for('poll.get_poll_report_csv', poll_id=poll.id) }}" download="{{ poll.title }}.csv">Download CSV</a>
-<table>
-    <caption>Choice Votes</caption>
-    <thead>
-        <tr>
-            <th>Caption</th>
-            <th>Votes</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for choice in choices %}
-        <tr>
-            <td>{{ choice.caption }}</td>
-            <td>{{ choice.votes }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+<section class="padded">
+    <h3>Download</h3>
+    <a href="{{ url_for('poll.get_poll_report_csv', poll_id=poll.id) }}" download="{{ poll.title }}.csv">Download
+        CSV</a>
+    <a href="{{ url_for('poll.get_poll_report_json', poll_id=poll.id) }}" download="{{ poll.title }}.json">Download
+        JSON</a>
+</section>
+<section class="padded">
+    <h3>Analytics</h3>
+    <table>
+        <caption>Choice Votes</caption>
+        <thead>
+            <tr>
+                <th>Caption</th>
+                <th>Votes</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for choice in choices %}
+            <tr>
+                <td>{{ choice.caption }}</td>
+                <td>{{ choice.votes }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</section>
 {% endblock %}

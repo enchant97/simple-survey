@@ -1,7 +1,7 @@
 from datetime import datetime
 
-from quart import (Blueprint, abort, flash, redirect, render_template, request,
-                   url_for, current_app)
+from quart import (Blueprint, abort, current_app, flash, jsonify, redirect,
+                   render_template, request, url_for)
 from tortoise.exceptions import DoesNotExist, ValidationError
 
 from ..database.models import Choice, Question
@@ -112,11 +112,23 @@ async def get_poll_report_csv(poll_id: int):
     try:
         poll = await Question.get(id=poll_id)
         choices = await poll.choices.all()
-        
+
     except DoesNotExist:
         abort(404)
     else:
         return current_app.response_class(generate(choices), mimetype="text/csv")
+
+
+@blueprint.get("/<int:poll_id>/report.json")
+async def get_poll_report_json(poll_id: int):
+    try:
+        poll = await Question.get(id=poll_id)
+        choices = await poll.choices.all()
+        choices = [choice.as_dict() for choice in choices]
+    except DoesNotExist:
+        abort(404)
+    else:
+        return jsonify(choices)
 
 
 @blueprint.get("/<int:poll_id>/edit")

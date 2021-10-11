@@ -2,7 +2,8 @@
     --bg-col: #f0f0f0;
     --main-col: #dddddd;
     --sub-col: #aaaaaa;
-
+    --sub-sub-col: #e6e6e6;
+    --bnt-bg-col: #c2c2c2;
     --bnt-fg-col: #292929;
 }
 
@@ -29,6 +30,10 @@ header div nav {
     gap: 10px;
 }
 
+header div nav a {
+    background-color: var(--main-col);
+}
+
 table {
     width: 100%;
     border-collapse: collapse;
@@ -48,12 +53,16 @@ table tbody tr:last-child {
     border-bottom: 4px solid var(--main-col);
 }
 
+h1,h2,h3 {
+    text-align: center;
+}
+
 a, button {
     text-align: center;
     text-decoration: none;
     color: var(--bnt-fg-col);
     padding: 5px;
-    background-color: var(--main-col);
+    background-color: var(--bnt-bg-col);
     border-radius: 5px;
     border: none;
 }
@@ -76,8 +85,22 @@ fieldset.poll-choices {
     grid-template-columns: max-content auto;
 }
 
+footer {
+    text-align: center;
+    margin-top: 100px;
+    border-top-style: solid;
+    padding-top: 10px;
+}
+
 .flex-center {
     display: flex;
     flex-direction: row;
     align-items: center;
+}
+
+.padded {
+    padding: 10px;
+    border-radius: 10px;
+    background-color: var(--sub-sub-col);
+    margin: 10px 0;
 }

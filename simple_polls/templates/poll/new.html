@@ -1,7 +1,7 @@
 {% extends "/base.html" %}
 {% block title %}New{% endblock %}
 {% block main %}
-<form action="{{ url_for('poll.post_new_poll') }}" method="post">
+<form class="padded" action="{{ url_for('poll.post_new_poll') }}" method="post">
     <label for="poll-title">Title</label>
     <input type="text" name="title" id="poll-title" maxlength="100" required>
     <label for="poll-description">Description</label>

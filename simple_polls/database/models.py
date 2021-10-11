@@ -26,3 +26,9 @@ class Choice(Model):
         "models.Question", "choices")
     caption = CharField(max_length=200)
     votes = IntField(default=0)
+
+    def as_dict(self):
+        return {
+            "caption": self.caption,
+            "votes": self.votes,
+        }

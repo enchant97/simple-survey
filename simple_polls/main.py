@@ -10,6 +10,7 @@ app = Quart(__name__)
 
 def create_app():
     app.secret_key = get_settings().SECRET_KEY
+    app.config["TITLE_NAME"] = get_settings().TITLE_NAME
     # register routes
     app.register_blueprint(home.blueprint, url_prefix="/")
     app.register_blueprint(poll.blueprint, url_prefix="/polls")
