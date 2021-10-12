@@ -4,7 +4,7 @@ from quart import (Blueprint, abort, current_app, flash, jsonify, redirect,
                    render_template, request, url_for)
 from tortoise.exceptions import DoesNotExist, ValidationError
 
-from ..database.models import Choice, Question
+from ..database.models import Choice, PChoice, PQuestion, Question, Vote
 
 blueprint = Blueprint("poll", __name__)
 
@@ -71,8 +71,9 @@ async def post_poll_vote(poll_id: int):
         choice = await Choice.get_or_none(id=choice_id)
         if choice is None:
             raise KeyError()
-        choice.votes += 1
-        await choice.save()
+
+        await Vote.create(choice=choice)
+
     except (KeyError, ValueError):
         await flash("Failed to cast vote", "error")
         return redirect(url_for(".get_poll", poll_id=poll_id))
@@ -105,14 +106,15 @@ async def get_poll_report(poll_id: int):
 
 @blueprint.get("/<int:poll_id>/report.csv")
 async def get_poll_report_csv(poll_id: int):
-    def generate(choices):
+    def generate(choices: list[Choice]):
         yield "Caption, Votes\n"
         for choice in choices:
-            yield f"'{choice.caption}', {choice.votes}\n"
+            caption = choice.caption
+            votes = len(choice.votes)
+            yield f"'{caption}', {votes}\n"
     try:
         poll = await Question.get(id=poll_id)
-        choices = await poll.choices.all()
-
+        choices = await poll.choices.all().prefetch_related("votes")
     except DoesNotExist:
         abort(404)
     else:
@@ -123,8 +125,17 @@ async def get_poll_report_csv(poll_id: int):
 async def get_poll_report_json(poll_id: int):
     try:
         poll = await Question.get(id=poll_id)
-        choices = await poll.choices.all()
-        choices = [choice.as_dict() for choice in choices]
+        choices = [choice.dict() for choice in await PChoice.from_queryset(poll.choices.all())]
+    except DoesNotExist:
+        abort(404)
+    else:
+        return jsonify(choices)
+
+
+@blueprint.get("/<int:poll_id>/report/with-meta.json")
+async def get_poll_report_json_with_meta(poll_id: int):
+    try:
+        choices = (await PQuestion.from_queryset_single(Question.get(id=poll_id))).dict()
     except DoesNotExist:
         abort(404)
     else:

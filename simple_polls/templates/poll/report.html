@@ -7,6 +7,9 @@
         CSV</a>
     <a href="{{ url_for('poll.get_poll_report_json', poll_id=poll.id) }}" download="{{ poll.title }}.json">Download
         JSON</a>
+    <a href="{{ url_for('poll.get_poll_report_json_with_meta', poll_id=poll.id) }}"
+        download="{{ poll.title }}.json">Download
+        JSON (With Meta)</a>
 </section>
 <section class="padded">
     <h3>Analytics</h3>
@@ -22,7 +25,7 @@
             {% for choice in choices %}
             <tr>
                 <td>{{ choice.caption }}</td>
-                <td>{{ choice.votes }}</td>
+                <td>{{ choice.votes|length }}</td>
             </tr>
             {% endfor %}
         </tbody>
