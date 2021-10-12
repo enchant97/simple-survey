@@ -104,3 +104,20 @@ footer {
     background-color: var(--sub-sub-col);
     margin: 10px 0;
 }
+
+.chart-report {
+    display: grid;
+    grid-template-columns: 33% 33% 33%;
+}
+
+@media(max-width: 500px) {
+    header div nav,
+    .flex-center {
+        margin: auto;
+        flex-direction: column;
+    }
+    .chart-report {
+        display: flex;
+        flex-direction: column;
+    }
+}

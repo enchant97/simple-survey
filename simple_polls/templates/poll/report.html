@@ -30,5 +30,13 @@
             {% endfor %}
         </tbody>
     </table>
+    <div class="chart-report">
+        <div><canvas id="chart-votes-pie"></canvas></div>
+        <div></div>
+        <div></div>
+    </div>
 </section>
+<script>
+    load_report_graphs("{{ url_for('poll.get_poll_report_json', poll_id=poll.id) }}")
+</script>
 {% endblock %}
