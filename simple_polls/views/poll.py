@@ -31,7 +31,8 @@ async def post_new_poll():
         if expires_at is not None and expires_at != "":
             expires_at = datetime.fromisoformat(expires_at)
             if expires_at < datetime.now():
-                raise ValueError()
+                await flash("Failed to create poll as 'expiry' is in the past", "error")
+                return redirect(url_for(".get_new_poll"))
         else:
             expires_at = None
 
@@ -52,8 +53,11 @@ async def post_new_poll():
 async def get_poll(poll_id: int):
     try:
         poll = await Question.get(id=poll_id)
+        if poll.has_expired:
+            await poll.delete()
+            await flash("poll has expired!", "error")
+            abort(404)
         choices = await poll.choices.all()
-        # TODO check if poll is expired
     except DoesNotExist:
         abort(404)
     else:
@@ -63,8 +67,11 @@ async def get_poll(poll_id: int):
 @blueprint.post("<int:poll_id>/vote")
 async def post_poll_vote(poll_id: int):
     try:
-        # TODO check if poll is expired
         poll = await Question.get(id=poll_id)
+        if poll.has_expired:
+            await poll.delete()
+            await flash("poll has expired!", "error")
+            abort(404)
         form = await request.form
         choice_id = int(form["poll-choice"])
 

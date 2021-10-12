@@ -12,13 +12,10 @@
     <header>
         <div class="flex-center">
             <h1>{{ config.TITLE_NAME }}</h1>
-            <nav>
-                <a href="{{ url_for('home.index') }}">Home</a>
-                <a href="{{ url_for('poll.get_manage_polls') }}">Manage Polls</a>
-                <a href="{{ url_for('poll.get_new_poll') }}">New Poll</a>
-            </nav>
+            {% include 'shared/navbar.html' %}
         </div>
         <h2>{{ self.title() }}</h2>
+        {% include 'shared/flashed_messages.html' %}
     </header>
     <main>{% block main %}{% endblock %}</main>
     <footer>
