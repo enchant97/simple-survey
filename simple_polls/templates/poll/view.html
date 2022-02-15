@@ -1,15 +1,20 @@
 {% extends "/base.html" %}
 {% block title %}{{ poll.title }}{% endblock %}
 {% block main %}
-<form class="padded" action="{{ url_for('poll.post_poll_vote', poll_id=poll.id) }}" method="post">
+<form action="{{ url_for('poll.post_poll_vote', poll_id=poll.id) }}" method="post">
     <p>{{ poll.description }}</p>
-    <fieldset class="poll-choices">
-        <legend>Select An Option</legend>
-        {% for choice in choices %}
-        <input type="radio" name="poll-choice" id="poll-choice-{{ choice.id }}" value="{{ choice.id }}" required>
-        <label for="poll-choice-{{ choice.id }}">{{ choice.caption }}</label>
-        {% endfor %}
+    <fieldset class="mb-4 row">
+        <legend class="col-form-label col-sm-2 pt-0">Select An Option</legend>
+        <div class="col-sm-10">
+            {% for choice in choices %}
+            <div>
+                <input class="form-check-input" type="radio" name="poll-choice" id="poll-choice-{{ choice.id }}"
+                    value="{{ choice.id }}" required>
+                <label class="form-check-label" for="poll-choice-{{ choice.id }}">{{ choice.caption }}</label>
+            </div>
+            {% endfor %}
+        </div>
     </fieldset>
-    <button type="submit">Vote</button>
+    <button class="btn btn-primary" type="submit">Vote</button>
 </form>
 {% endblock %}

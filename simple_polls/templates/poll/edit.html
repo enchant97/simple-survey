@@ -1,35 +1,45 @@
 {% extends "/base.html" %}
 {% block title %}Edit{% endblock %}
 {% block main %}
-<section class="padded">
+<section class="mb-4">
     <h3>Modify Meta</h3>
     <form action="{{ url_for('poll.post_poll_edit', poll_id=poll.id) }}" method="post">
-        <label for="poll-title">Title</label>
-        <input type="text" name="title" id="poll-title" maxlength="100" value="{{ poll.title }}" required>
-        <label for="poll-description">Description</label>
-        <input type="text" name="description" id="poll-description" maxlength="200" value="{{ poll.description }}"
-            required>
-        <label for="poll-expires_at">Expires</label>
-        <input type="datetime-local" name="expires_at" id="poll-expires_at" {% if poll.expires_at %}
-            value="{{ poll.expires_at }}" {% endif %}>
-        <button type="submit">Save</button>
-        <a href="{{ url_for('poll.get_poll_delete', poll_id=poll.id) }}">Delete</a>
+        <div class="mb-3 form-floating">
+            <input class="form-control" type="text" name="title" id="poll-title" maxlength="100"
+                value="{{ poll.title }}" placeholder="The Poll Title" required>
+            <label for="poll-title">Title</label>
+        </div>
+        <div class="mb-3 form-floating">
+            <input class="form-control" type="text" name="description" id="poll-description" maxlength="200"
+                value="{{ poll.description }}" placeholder="The Poll Description" required>
+            <label for="poll-description">Description</label>
+        </div>
+        <div class="mb-3">
+            <label class="form-label" for="poll-expires_at">Expires</label>
+            <input class="form-control" type="datetime-local" name="expires_at" id="poll-expires_at" {% if
+                poll.expires_at %} value="{{ poll.expires_at }}" {% endif %}>
+        </div>
+        <button class="btn btn-primary" type="submit">Save</button>
+        <a class="btn btn-danger" href="{{ url_for('poll.get_poll_delete', poll_id=poll.id) }}">Delete</a>
     </form>
 </section>
 
 
-<section class="padded">
+<section class="mb-4">
     <h3>Add Choice</h3>
     <form action="{{ url_for('poll.post_manage_choices_new', poll_id=poll.id) }}" method="post">
-        <label for="poll-choice-caption">Caption</label>
-        <input type="text" name="caption" id="poll-choice-caption" maxlength="200" required>
-        <button type="submit">Add</button>
+        <div class="mb-3 form-floating">
+            <input class="form-control" type="text" name="caption" id="poll-choice-caption" maxlength="200"
+                placeholder="Choice Caption" required>
+            <label for="poll-choice-caption">Caption</label>
+        </div>
+        <button class="btn btn-primary" type="submit">Add</button>
     </form>
 </section>
 
-<section class="padded">
+<section class="mb-4">
     <h3>Modify Choices</h3>
-    <table>
+    <table class="table">
         <thead>
             <tr>
                 <th>Caption</th>
@@ -40,7 +50,7 @@
             {% for choice in choices %}
             <tr>
                 <td>{{ choice.caption }}</td>
-                <td><a
+                <td><a class="btn btn-danger"
                         href="{{ url_for('poll.get_manage_choices_delete', poll_id=poll.id, choice_id=choice.id) }}">Delete</a>
                 </td>
             </tr>

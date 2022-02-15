@@ -1,19 +1,23 @@
 {% extends "/base.html" %}
 {% block title %}{{ poll.title }} - Report{% endblock %}
 {% block main %}
-<section class="padded">
+<section class="mb-4">
     <h3>Download</h3>
-    <a href="{{ url_for('poll.get_poll_report_csv', poll_id=poll.id) }}" download="{{ poll.title }}.csv">Download
-        CSV</a>
-    <a href="{{ url_for('poll.get_poll_report_json', poll_id=poll.id) }}" download="{{ poll.title }}.json">Download
-        JSON</a>
-    <a href="{{ url_for('poll.get_poll_report_json_with_meta', poll_id=poll.id) }}"
-        download="{{ poll.title }}.json">Download
-        JSON (With Meta)</a>
+    <div class="d-flex flex-wrap gap-2">
+        <a class="btn btn-outline-dark" href="{{ url_for('poll.get_poll_report_csv', poll_id=poll.id) }}"
+            download="{{ poll.title }}.csv">Download
+            CSV</a>
+        <a class="btn btn-outline-dark" href="{{ url_for('poll.get_poll_report_json', poll_id=poll.id) }}"
+            download="{{ poll.title }}.json">Download
+            JSON</a>
+        <a class="btn btn-outline-dark" href="{{ url_for('poll.get_poll_report_json_with_meta', poll_id=poll.id) }}"
+            download="{{ poll.title }}.json">Download
+            JSON (With Meta)</a>
+    </div>
 </section>
-<section class="padded">
+<section class="mb-4">
     <h3>Analytics</h3>
-    <table>
+    <table class="table">
         <caption>Choice Votes</caption>
         <thead>
             <tr>
@@ -30,10 +34,10 @@
             {% endfor %}
         </tbody>
     </table>
-    <div class="chart-report">
-        <div><canvas id="chart-votes-pie"></canvas></div>
-        <div></div>
-        <div></div>
+    <div class="row">
+        <div class="col"><canvas id="chart-votes-pie"></canvas></div>
+        <div class="col"></div>
+        <div class="col"></div>
     </div>
 </section>
 <script>
