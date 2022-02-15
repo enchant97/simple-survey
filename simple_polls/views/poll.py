@@ -31,7 +31,7 @@ async def post_new_poll():
         if expires_at is not None and expires_at != "":
             expires_at = datetime.fromisoformat(expires_at)
             if expires_at < datetime.now():
-                await flash("Failed to create poll as 'expiry' is in the past", "error")
+                await flash("Failed to create poll as 'expiry' is in the past", "danger")
                 return redirect(url_for(".get_new_poll"))
         else:
             expires_at = None
@@ -42,10 +42,10 @@ async def post_new_poll():
             expires_at=expires_at,
         )
     except (KeyError, ValueError, ValidationError):
-        await flash("Failed to create poll", "error")
+        await flash("Failed to create poll", "danger")
         return redirect(url_for(".get_new_poll"))
     else:
-        await flash("Created poll")
+        await flash("Created poll", "success")
         return redirect(url_for(".get_poll_edit", poll_id=question.id))
 
 
@@ -55,7 +55,7 @@ async def get_poll(poll_id: int):
         poll = await Question.get(id=poll_id)
         if poll.has_expired:
             await poll.delete()
-            await flash("poll has expired!", "error")
+            await flash("poll has expired!", "danger")
             abort(404)
         choices = await poll.choices.all()
     except DoesNotExist:
@@ -70,7 +70,7 @@ async def post_poll_vote(poll_id: int):
         poll = await Question.get(id=poll_id)
         if poll.has_expired:
             await poll.delete()
-            await flash("poll has expired!", "error")
+            await flash("poll has expired!", "danger")
             abort(404)
         form = await request.form
         choice_id = int(form["poll-choice"])
@@ -82,7 +82,7 @@ async def post_poll_vote(poll_id: int):
         await Vote.create(choice=choice)
 
     except (KeyError, ValueError):
-        await flash("Failed to cast vote", "error")
+        await flash("Failed to cast vote", "danger")
         return redirect(url_for(".get_poll", poll_id=poll_id))
     except DoesNotExist:
         abort(404)
@@ -181,12 +181,12 @@ async def post_poll_edit(poll_id: int):
         poll.expires_at = expires_at
         await poll.save()
     except (KeyError, ValueError, ValidationError):
-        await flash("Failed to update poll", "error")
+        await flash("Failed to update poll", "danger")
         return redirect(url_for(".get_poll_edit", poll_id=poll_id))
     except DoesNotExist:
         abort(404)
     else:
-        await flash("Updated poll")
+        await flash("Updated poll", "success")
         return redirect(url_for(".get_poll_edit", poll_id=poll_id))
 
 
@@ -211,7 +211,7 @@ async def post_manage_choices_new(poll_id: int):
             caption=form["caption"],
         )
     except (KeyError, ValidationError):
-        await flash("Failed to update poll", "error")
+        await flash("Failed to update poll", "danger")
         return redirect(url_for("get_poll_edit", poll_id=poll_id))
     except DoesNotExist:
         abort(404)
