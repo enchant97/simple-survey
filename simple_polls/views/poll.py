@@ -53,16 +53,23 @@ async def post_new_poll():
 @blueprint.get("/<int:poll_id>")
 async def get_poll(poll_id: int):
     try:
-        poll = await Question.get(id=poll_id)
+        poll = await Poll.get(id=poll_id)
         if poll.has_expired:
             await poll.delete()
-            await flash("poll has expired!", "danger")
+            await flash("Poll has expired!", "danger")
             abort(404)
-        choices = await poll.choices.all()
+
+        fields = await poll.fields.all().prefetch_related("options")
+
     except DoesNotExist:
         abort(404)
     else:
-        return await render_template("/poll/view.html", poll=poll, choices=choices)
+        return await render_template(
+            "/poll/view.html",
+            poll=poll,
+            fields=fields,
+            FieldTypes=FieldTypes,
+        )
 
 
 @blueprint.post("<int:poll_id>/vote")
@@ -94,7 +101,7 @@ async def post_poll_vote(poll_id: int):
 @blueprint.get("/<int:poll_id>/thanks")
 async def get_poll_thanks(poll_id: int):
     try:
-        poll = await Question.get(id=poll_id)
+        poll = await Poll.get(id=poll_id)
     except DoesNotExist:
         abort(404)
     else:
