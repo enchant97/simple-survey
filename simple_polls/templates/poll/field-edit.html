@@ -39,7 +39,9 @@
             {% for option in options %}
             <tr>
                 <td>{{ option.caption }}</td>
-                <td><a class="btn btn-danger" href="">Delete</a></td>
+                <td><a class="btn btn-danger"
+                        href="{{ url_for('poll.get_poll_field_option_delete', poll_id=poll.id, field_id=field.id, option_id=option.id) }}">Delete</a>
+                </td>
             </tr>
             {% endfor %}
         </tbody>

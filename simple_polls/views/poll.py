@@ -4,7 +4,7 @@ from quart import (Blueprint, abort, current_app, flash, jsonify, redirect,
                    render_template, request, url_for)
 from tortoise.exceptions import DoesNotExist, ValidationError
 
-from ..database.models import Field, Poll, FieldOption
+from ..database.models import Field, FieldOption, Poll
 from ..types import FieldOptionTypes, FieldTypes, FieldValueTypes
 
 blueprint = Blueprint("poll", __name__)
@@ -335,6 +335,20 @@ async def post_poll_field_new_option(poll_id: int, field_id: int):
 
         await FieldOption.create(field=field, caption=caption)
 
+        return redirect(url_for('poll.get_poll_field_edit', poll_id=poll.id, field_id=field.id))
+
+    except DoesNotExist:
+        abort(404)
+
+
+@blueprint.get("/<int:poll_id>/edit/field/<int:field_id>/<int:option_id>/delete")
+async def get_poll_field_option_delete(poll_id: int, field_id: int, option_id: int):
+    try:
+        poll = await Poll.get(id=poll_id)
+        field: Field = await poll.fields.filter(id=field_id).get()
+        await field.options.filter(id=option_id).delete()
+
+        await flash("deleted field option", "success")
         return redirect(url_for('poll.get_poll_field_edit', poll_id=poll.id, field_id=field.id))
 
     except DoesNotExist:
