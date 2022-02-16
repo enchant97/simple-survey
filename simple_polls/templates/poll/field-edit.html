@@ -1,0 +1,49 @@
+{% extends "/base.html" %}
+{% block title %}Field Edit{% endblock %}
+{% block main %}
+<form class="mb-3" action="{{ url_for('poll.post_poll_field_edit', poll_id=poll.id, field_id=field.id) }}"
+    method="post">
+    <div class="mb-3 form-floating">
+        <input class="form-control" type="text" name="caption" id="field-caption" maxlength="100"
+            value="{{ field.caption }}" placeholder="The Field Caption" required>
+        <label for="field-caption">Caption</label>
+    </div>
+    <select class="mb-3 form-select" name="field-type" id="field-type" aria-label="The Field Type" required>
+        <option value="">Choose Field Type</option>
+        {% for value in field_types %}
+        <option value="{{ value }}" {% if value==field.field_type.value %}selected{% endif %}>{{ value }}</option>
+        {% endfor %}
+    </select>
+    <div class="mb-3 form-check">
+        <input class="form-check-input" type="checkbox" name="required" id="field-required" value="1" {% if
+            field.required %} checked{% endif %}>
+        <label class="form-check-label" for="field-required">Required</label>
+    </div>
+    <button class="btn btn-primary" type="submit">Save</button>
+    <a class="btn btn-danger" href="{{ url_for('poll.get_poll_edit', poll_id=poll.id) }}">Cancel</a>
+</form>
+
+{% if allow_options %}
+<div class="mb-3">
+    <h2>Options</h2>
+    <a class="mb-3 btn btn-primary"
+        href="{{ url_for('poll.get_poll_field_new_option', poll_id=poll.id, field_id=field.id) }}">New Option</a>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Caption</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for option in options %}
+            <tr>
+                <td>{{ option.caption }}</td>
+                <td><a class="btn btn-danger" href="">Delete</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+{% endblock %}

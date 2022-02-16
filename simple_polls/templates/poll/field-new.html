@@ -1,0 +1,22 @@
+{% extends "/base.html" %}
+{% block title %}New Field{% endblock %}
+{% block main %}
+<form action="" method="post">
+    <div class="mb-3 form-floating">
+        <input class="form-control" type="text" name="caption" id="field-caption" maxlength="100" placeholder="The Field Caption" required>
+        <label for="field-caption">Caption</label>
+    </div>
+    <select class="mb-3 form-select" name="field-type" id="field-type" aria-label="The Field Type" required>
+        <option value="">Choose Field Type</option>
+        {% for value in field_types %}
+        <option value="{{ value }}">{{ value }}</option>
+        {% endfor %}
+      </select>
+    <div class="mb-3 form-check">
+        <input class="form-check-input" type="checkbox" name="required" id="field-required" value="1" checked>
+        <label class="form-check-label" for="field-required">Required</label>
+    </div>
+    <button class="btn btn-primary" type="submit">Create</button>
+    <a class="btn btn-danger" href="{{ url_for('poll.get_poll_edit', poll_id=poll.id) }}">Cancel</a>
+</form>
+{% endblock %}

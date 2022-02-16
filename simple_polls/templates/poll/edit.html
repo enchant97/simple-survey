@@ -24,34 +24,26 @@
     </form>
 </section>
 
-
 <section class="mb-4">
-    <h3>Add Choice</h3>
-    <form action="{{ url_for('poll.post_manage_choices_new', poll_id=poll.id) }}" method="post">
-        <div class="mb-3 form-floating">
-            <input class="form-control" type="text" name="caption" id="poll-choice-caption" maxlength="200"
-                placeholder="Choice Caption" required>
-            <label for="poll-choice-caption">Caption</label>
-        </div>
-        <button class="btn btn-primary" type="submit">Add</button>
-    </form>
-</section>
-
-<section class="mb-4">
-    <h3>Modify Choices</h3>
+    <h3>Fields</h3>
+    <a class="btn btn-primary" href="{{ url_for('poll.get_poll_field_new', poll_id=poll.id) }}">New Field</a>
     <table class="table">
         <thead>
             <tr>
                 <th>Caption</th>
                 <th></th>
+                <th></th>
             </tr>
         </thead>
         <tbody>
-            {% for choice in choices %}
+            {% for field in fields %}
             <tr>
-                <td>{{ choice.caption }}</td>
+                <td>{{ field.caption }}</td>
+                <td><a class="btn btn-outline-dark"
+                        href="{{ url_for('poll.get_poll_field_edit', poll_id=poll.id, field_id=field.id) }}">Edit</a>
+                </td>
                 <td><a class="btn btn-danger"
-                        href="{{ url_for('poll.get_manage_choices_delete', poll_id=poll.id, choice_id=choice.id) }}">Delete</a>
+                        href="{{ url_for('poll.get_poll_field_delete', poll_id=poll.id, field_id=field.id) }}">Delete</a>
                 </td>
             </tr>
             {% endfor %}
