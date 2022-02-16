@@ -1,9 +1,18 @@
 {% extends "/base.html" %}
-{% block title %}{{ poll.title }} - Report{% endblock %}
+{% block title %}{{ poll.title }} - Analytics{% endblock %}
 {% block main %}
-<section class="mb-4">
-    <h3>Download</h3>
-    <div class="d-flex flex-wrap gap-2">
+<nav class="d-flex justify-content-center" aria-label="page section navigation">
+    <ul class="pagination pagination-sm">
+        <li class="page-item"><a class="page-link" href="#section-downloads">Downloads</a></li>
+        <li class="page-item"><a class="page-link" href="#section-metadata">Metadata</a></li>
+        <li class="page-item"><a class="page-link" href="#section-per-field">Per Field</a></li>
+        <li class="page-item"><a class="page-link" href="#section-charts">Charts</a></li>
+    </ul>
+</nav>
+
+<section class="mb-4" id="section-downloads">
+    <h3>Downloads</h3>
+    <div class="d-flex flex-wrap gap-2 justify-content-center">
         <a class="btn btn-outline-dark" href="{{ url_for('poll.get_poll_report_csv', poll_id=poll.id) }}"
             download="{{ poll.title }}.csv">Download
             CSV</a>
@@ -15,32 +24,65 @@
             JSON (With Meta)</a>
     </div>
 </section>
-<section class="mb-4">
-    <h3>Analytics</h3>
-    <table class="table">
-        <caption>Choice Votes</caption>
-        <thead>
-            <tr>
-                <th>Caption</th>
-                <th>Votes</th>
-            </tr>
-        </thead>
+
+<section class="mb-4" id="section-metadata">
+    <h3>Metadata</h3>
+    <table class="table" aria-label="metadata table">
         <tbody>
-            {% for choice in choices %}
             <tr>
-                <td>{{ choice.caption }}</td>
-                <td>{{ choice.votes|length }}</td>
+                <th>Title</th>
+                <td>{{ poll.title }}</td>
             </tr>
-            {% endfor %}
+            <tr>
+                <th>Description</th>
+                <td>{{ poll.description }}</td>
+            </tr>
+            <tr>
+                <th>Expires</th>
+                <td>{% if poll.expires_at %}{{ poll.expires_at }}{% else %}Never{% endif %}</td>
+            </tr>
         </tbody>
     </table>
-    <div class="row">
-        <div class="col"><canvas id="chart-votes-pie"></canvas></div>
-        <div class="col"></div>
-        <div class="col"></div>
-    </div>
 </section>
+
+<section class="mb-4" id="section-per-field">
+    <h3>Per Field</h3>
+    {% for field in fields %}
+    <div class="mb-2">
+        <h4>{{ field.caption }}</h4>
+        {% if field.field_type in (FieldTypes.RADIO, FieldTypes.CHECK, FieldTypes.DROP_DOWN) %}
+        <ul class="list-group">
+            {% for option in field.options %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                {{ option.caption }}
+                <span class="badge bg-primary rounded-pill">{{ option.votes | length }}</span>
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        {% if field.values %}
+        <ul class="list-group">
+            {% for value in field.values %}
+            <li class="list-group-item">{{ value.value }}</li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p class="alert-light">No data recorded.</p>
+        {% endif %}
+        {% endif %}
+    </div>
+    {% endfor %}
+</section>
+
+<section class="mb-4" id="section-charts">
+    <h3>Charts</h3>
+</section>
+
+<nav class="d-flex justify-content-center">
+    <a class="btn btn-outline-primary btn-sm align-middle" href="#">Back To Top</a>
+</nav>
+
 <script>
-    load_report_graphs("{{ url_for('poll.get_poll_report_json', poll_id=poll.id) }}")
+    // load_report_graphs("{{ url_for('poll.get_poll_report_json', poll_id=poll.id) }}")
 </script>
 {% endblock %}

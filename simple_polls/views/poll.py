@@ -130,12 +130,17 @@ async def get_poll_thanks(poll_id: int):
 @blueprint.get("/<int:poll_id>/report")
 async def get_poll_report(poll_id: int):
     try:
-        poll = await Question.get(id=poll_id)
-        choices = await poll.choices.all()
+        poll = await Poll.get(id=poll_id)
+        fields = await poll.fields.all().prefetch_related("options", "options__votes", "values")
     except DoesNotExist:
         abort(404)
     else:
-        return await render_template("/poll/report.html", poll=poll, choices=choices)
+        return await render_template(
+            "/poll/report.html",
+            poll=poll,
+            fields=fields,
+            FieldTypes=FieldTypes,
+        )
 
 
 @blueprint.get("/<int:poll_id>/report.csv")
