@@ -4,8 +4,9 @@ from quart import (Blueprint, abort, current_app, flash, jsonify, redirect,
                    render_template, request, url_for)
 from tortoise.exceptions import DoesNotExist, ValidationError
 
-from ..database.models import Field, FieldOption, Poll
-from ..types import FieldOptionTypes, FieldTypes, FieldValueTypes
+from ..database.models import (Field, FieldOption, FieldOptionVote, FieldValue,
+                               Poll)
+from ..types import FieldOptionTypes, FieldTypes
 
 blueprint = Blueprint("poll", __name__)
 
@@ -75,23 +76,41 @@ async def get_poll(poll_id: int):
 @blueprint.post("<int:poll_id>/vote")
 async def post_poll_vote(poll_id: int):
     try:
-        poll = await Question.get(id=poll_id)
+        poll = await Poll.get(id=poll_id)
         if poll.has_expired:
             await poll.delete()
             await flash("poll has expired!", "danger")
             abort(404)
+
         form = await request.form
-        choice_id = int(form["poll-choice"])
+        to_commit = []
 
-        choice = await Choice.get_or_none(id=choice_id)
-        if choice is None:
-            raise KeyError()
+        for key, value in form.items():
+            field = await poll.fields.filter(id=key).get()
+            try:
+                FieldOptionTypes(field.field_type.value)
+                option = await field.options.filter(id=value).get()
+                to_commit.append(FieldOptionVote(option=option))
+            except ValueError:
+                if field.field_type == FieldTypes.SHORT_TEXT:
+                    to_commit.append(FieldValue(field=field, value=value.strip()[:60]))
+                elif field.field_type == FieldTypes.SHORT_TEXT:
+                    to_commit.append(FieldValue(field=field, value=value.strip()[:255]))
+                elif field.field_type == FieldTypes.EMAIL:
+                    # TODO match email regex here
+                    to_commit.append(FieldValue(field=field, value=value[:255]))
+                elif field.field_type == FieldTypes.PHONE:
+                    # TODO match phone regex here
+                    to_commit.append(FieldValue(field=field, value=value[255]))
+                elif field.field_type == FieldTypes.INTEGER:
+                    to_commit.append(FieldValue(field=field, value=int(value)))
+                else:
+                    abort(404)
 
-        await Vote.create(choice=choice)
+        # this makes sure only the whole poll is filled in
+        for row in to_commit:
+            await row.save()
 
-    except (KeyError, ValueError):
-        await flash("Failed to cast vote", "danger")
-        return redirect(url_for(".get_poll", poll_id=poll_id))
     except DoesNotExist:
         abort(404)
     else:
