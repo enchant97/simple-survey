@@ -4,7 +4,7 @@
 <form action="{{ url_for('survey.post_new_survey') }}" method="post">
     <div class="mb-3 form-floating">
         <input class="form-control" type="text" name="title" id="survey-title" maxlength="100"
-            placeholder="The Survey Title" required>
+            placeholder="The Survey Title" required autofocus>
         <label for="survey-title">Title</label>
     </div>
     <div class="mb-3 form-floating">
