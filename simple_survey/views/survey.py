@@ -219,7 +219,7 @@ async def post_survey_edit(survey_id: int):
         else:
             expires_at = None
 
-        survey = await Question.get(id=survey_id)
+        survey = await Survey.get(id=survey_id)
         survey.title = title
         survey.description = description
         survey.expires_at = expires_at
