@@ -20,6 +20,7 @@ class Survey(Model):
     expires_at = DatetimeField(null=True)
 
     fields = ReverseRelation["Field"]
+    responses = ReverseRelation["SurveyResponse"]
 
     @property
     def has_expired(self):
@@ -47,17 +48,6 @@ class Field(Model):
         exclude = ["survey"]
 
 
-class FieldValue(Model):
-    """
-    A value stored relating to a
-    field (the users entered value)
-    """
-    field: ForeignKeyRelation[Field] = ForeignKeyField(
-        "models.Field", "values")
-    when = DatetimeField(auto_now_add=True)
-    value = CharField(255)
-
-
 class FieldOption(Model):
     """
     A field option to group multiple
@@ -73,13 +63,39 @@ class FieldOption(Model):
         exclude = ["field"]
 
 
+class SurveyResponse(Model):
+    """
+    When a user has submitted a survey response,
+    used to group together survey field responses
+    """
+    survey: ForeignKeyRelation[Survey] = ForeignKeyField(
+        "models.Survey", "responses")
+    when = DatetimeField(auto_now_add=True)
+
+    class PydanticMeta:
+        exclude = ["survey"]
+
+
+class FieldValue(Model):
+    """
+    A value stored relating to a
+    field (the users entered value)
+    """
+    response: ForeignKeyRelation[SurveyResponse] = ForeignKeyField(
+        "models.SurveyResponse")
+    field: ForeignKeyRelation[Field] = ForeignKeyField(
+        "models.Field", "values")
+    value = CharField(255)
+
+
 class FieldOptionVote(Model):
     """
     Store when a field option is 'voted' by the user
     """
+    response: ForeignKeyRelation[SurveyResponse] = ForeignKeyField(
+        "models.SurveyResponse")
     option: ForeignKeyRelation[FieldOption] = ForeignKeyField(
         "models.FieldOption", "votes")
-    when = DatetimeField(auto_now_add=True)
 
 
     class PydanticMeta:
@@ -91,6 +107,7 @@ Tortoise.init_models([__name__], "models")
 
 PSurvey = pydantic_model_creator(Survey)
 PField = pydantic_model_creator(Field)
-PFieldValue = pydantic_model_creator(FieldValue)
 PFieldOption = pydantic_model_creator(FieldOption)
+PSurveyResponse = pydantic_model_creator(SurveyResponse)
+PFieldValue = pydantic_model_creator(FieldValue)
 PFieldFieldOptionVote = pydantic_model_creator(FieldOptionVote)

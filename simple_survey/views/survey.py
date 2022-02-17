@@ -3,9 +3,10 @@ from datetime import datetime
 from quart import (Blueprint, abort, current_app, flash, jsonify, redirect,
                    render_template, request, url_for)
 from tortoise.exceptions import DoesNotExist, ValidationError
+from tortoise.transactions import atomic
 
 from ..database.models import (Field, FieldOption, FieldOptionVote, FieldValue,
-                               Survey)
+                               Survey, SurveyResponse)
 from ..types import FieldOptionTypes, FieldTypes
 
 blueprint = Blueprint("survey", __name__)
@@ -74,6 +75,7 @@ async def get_survey(survey_id: int):
 
 
 @blueprint.post("<int:survey_id>/vote")
+@atomic()
 async def post_survey_vote(survey_id: int):
     try:
         survey = await Survey.get(id=survey_id)
@@ -83,33 +85,31 @@ async def post_survey_vote(survey_id: int):
             abort(404)
 
         form = await request.form
-        to_commit = []
+
+        response = SurveyResponse(survey=survey)
+        await response.save()
 
         for key, value in form.items():
             field = await survey.fields.filter(id=key).get()
             try:
                 FieldOptionTypes(field.field_type.value)
                 option = await field.options.filter(id=value).get()
-                to_commit.append(FieldOptionVote(option=option))
+                await FieldOptionVote.create(response=response, option=option)
             except ValueError:
                 if field.field_type == FieldTypes.SHORT_TEXT:
-                    to_commit.append(FieldValue(field=field, value=value.strip()[:60]))
-                elif field.field_type == FieldTypes.SHORT_TEXT:
-                    to_commit.append(FieldValue(field=field, value=value.strip()[:255]))
+                    await FieldValue.create(response=response, field=field, value=value.strip()[:60])
+                elif field.field_type == FieldTypes.LONG_TEXT:
+                    await FieldValue.create(response=response, field=field, value=value.strip()[:255])
                 elif field.field_type == FieldTypes.EMAIL:
                     # TODO match email regex here
-                    to_commit.append(FieldValue(field=field, value=value[:255]))
+                    await FieldValue.create(response=response, field=field, value=value[:255])
                 elif field.field_type == FieldTypes.PHONE:
                     # TODO match phone regex here
-                    to_commit.append(FieldValue(field=field, value=value[255]))
+                    await FieldValue.create(response=response, field=field, value=value[255])
                 elif field.field_type == FieldTypes.INTEGER:
-                    to_commit.append(FieldValue(field=field, value=int(value)))
+                    await FieldValue.create(response=response, field=field, value=int(value))
                 else:
                     abort(404)
-
-        # this makes sure only the whole survey is filled in
-        for row in to_commit:
-            await row.save()
 
     except DoesNotExist:
         abort(404)
