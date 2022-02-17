@@ -131,6 +131,7 @@ async def get_survey_thanks(survey_id: int):
 async def get_survey_report(survey_id: int):
     try:
         survey = await Survey.get(id=survey_id)
+        survey_response_count = await survey.responses.all().count()
         fields = await survey.fields.all().prefetch_related("options", "options__votes", "values")
     except DoesNotExist:
         abort(404)
@@ -138,6 +139,7 @@ async def get_survey_report(survey_id: int):
         return await render_template(
             "/survey/report.html",
             survey=survey,
+            survey_response_count=survey_response_count,
             fields=fields,
             FieldTypes=FieldTypes,
         )

@@ -53,6 +53,10 @@
                 <th>Expires</th>
                 <td>{% if survey.expires_at %}{{ survey.expires_at }}{% else %}Never{% endif %}</td>
             </tr>
+            <tr>
+                <th>Responses</th>
+                <td>{{ survey_response_count }}</td>
+            </tr>
         </tbody>
     </table>
 </section>
