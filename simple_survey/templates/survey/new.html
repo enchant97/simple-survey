@@ -16,6 +16,7 @@
         <label class="form-label" for="survey-expires_at">Expires</label>
         <input class="form-control" type="datetime-local" name="expires_at" id="survey-expires_at">
     </div>
+    <a class="btn btn-outline-dark" href="{{ url_for('home.index') }}">Cancel</a>
     <button class="btn btn-primary" type="submit">Create</button>
 </form>
 {% endblock %}

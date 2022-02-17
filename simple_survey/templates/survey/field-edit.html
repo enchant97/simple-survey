@@ -19,15 +19,16 @@
             field.required %} checked{% endif %}>
         <label class="form-check-label" for="field-required">Required</label>
     </div>
+    <a class="btn btn-outline-dark" href="{{ url_for('survey.get_survey_edit', survey_id=survey.id) }}">Cancel</a>
     <button class="btn btn-primary" type="submit">Save</button>
-    <a class="btn btn-danger" href="{{ url_for('survey.get_survey_edit', survey_id=survey.id) }}">Cancel</a>
 </form>
 
 {% if allow_options %}
 <div class="mb-3">
     <h2>Options</h2>
-    <a class="mb-3 btn btn-primary"
-        href="{{ url_for('survey.get_survey_field_new_option', survey_id=survey.id, field_id=field.id) }}">New Option</a>
+    <a class="mb-3 btn btn-outline-dark"
+        href="{{ url_for('survey.get_survey_field_new_option', survey_id=survey.id, field_id=field.id) }}">New
+        Option</a>
     <table class="table">
         <thead>
             <tr>

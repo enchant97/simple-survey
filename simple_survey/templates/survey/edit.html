@@ -2,7 +2,7 @@
 {% block title %}Edit{% endblock %}
 {% block main %}
 <section class="mb-4">
-    <h3>Modify Meta</h3>
+    <h3>Modify Metadata</h3>
     <form action="{{ url_for('survey.post_survey_edit', survey_id=survey.id) }}" method="post">
         <div class="mb-3 form-floating">
             <input class="form-control" type="text" name="title" id="survey-title" maxlength="100"
@@ -19,6 +19,7 @@
             <input class="form-control" type="datetime-local" name="expires_at" id="survey-expires_at" {% if
                 survey.expires_at %} value="{{ survey.expires_at }}" {% endif %}>
         </div>
+        <a class="btn btn-outline-dark" href="{{ url_for('survey.get_manage_surveys') }}">Cancel</a>
         <button class="btn btn-primary" type="submit">Save</button>
         <a class="btn btn-danger" href="{{ url_for('survey.get_survey_delete', survey_id=survey.id) }}">Delete</a>
     </form>
@@ -26,7 +27,8 @@
 
 <section class="mb-4">
     <h3>Fields</h3>
-    <a class="btn btn-primary" href="{{ url_for('survey.get_survey_field_new', survey_id=survey.id) }}">New Field</a>
+    <a class="btn btn-outline-dark" href="{{ url_for('survey.get_survey_field_new', survey_id=survey.id) }}">New
+        Field</a>
     <table class="table">
         <thead>
             <tr>
