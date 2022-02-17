@@ -3,7 +3,7 @@ from tortoise.contrib.quart import register_tortoise
 
 from .config import get_settings
 from .database import models
-from .views import home, poll
+from .views import home, survey
 
 app = Quart(__name__)
 
@@ -13,7 +13,7 @@ def create_app():
     app.config["TITLE_NAME"] = get_settings().TITLE_NAME
     # register routes
     app.register_blueprint(home.blueprint, url_prefix="/")
-    app.register_blueprint(poll.blueprint, url_prefix="/polls")
+    app.register_blueprint(survey.blueprint, url_prefix="/surveys")
     # database setup
     register_tortoise(
         app,

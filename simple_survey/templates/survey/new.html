@@ -1,0 +1,21 @@
+{% extends "/base.html" %}
+{% block title %}New{% endblock %}
+{% block main %}
+<form action="{{ url_for('survey.post_new_survey') }}" method="post">
+    <div class="mb-3 form-floating">
+        <input class="form-control" type="text" name="title" id="survey-title" maxlength="100"
+            placeholder="The Survey Title" required>
+        <label for="survey-title">Title</label>
+    </div>
+    <div class="mb-3 form-floating">
+        <textarea class="form-control" type="text" name="description" id="survey-description" maxlength="200"
+            placeholder="The Survey Description" required></textarea>
+        <label for="survey-description">Description</label>
+    </div>
+    <div class="mb-3">
+        <label class="form-label" for="survey-expires_at">Expires</label>
+        <input class="form-control" type="datetime-local" name="expires_at" id="survey-expires_at">
+    </div>
+    <button class="btn btn-primary" type="submit">Create</button>
+</form>
+{% endblock %}

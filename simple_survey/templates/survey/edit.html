@@ -1,0 +1,53 @@
+{% extends "/base.html" %}
+{% block title %}Edit{% endblock %}
+{% block main %}
+<section class="mb-4">
+    <h3>Modify Meta</h3>
+    <form action="{{ url_for('survey.post_survey_edit', survey_id=survey.id) }}" method="post">
+        <div class="mb-3 form-floating">
+            <input class="form-control" type="text" name="title" id="survey-title" maxlength="100"
+                value="{{ survey.title }}" placeholder="The Survey Title" required>
+            <label for="survey-title">Title</label>
+        </div>
+        <div class="mb-3 form-floating">
+            <input class="form-control" type="text" name="description" id="survey-description" maxlength="200"
+                value="{{ survey.description }}" placeholder="The Survey Description" required>
+            <label for="survey-description">Description</label>
+        </div>
+        <div class="mb-3">
+            <label class="form-label" for="survey-expires_at">Expires</label>
+            <input class="form-control" type="datetime-local" name="expires_at" id="survey-expires_at" {% if
+                survey.expires_at %} value="{{ survey.expires_at }}" {% endif %}>
+        </div>
+        <button class="btn btn-primary" type="submit">Save</button>
+        <a class="btn btn-danger" href="{{ url_for('survey.get_survey_delete', survey_id=survey.id) }}">Delete</a>
+    </form>
+</section>
+
+<section class="mb-4">
+    <h3>Fields</h3>
+    <a class="btn btn-primary" href="{{ url_for('survey.get_survey_field_new', survey_id=survey.id) }}">New Field</a>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Caption</th>
+                <th></th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for field in fields %}
+            <tr>
+                <td>{{ field.caption }}</td>
+                <td><a class="btn btn-outline-dark"
+                        href="{{ url_for('survey.get_survey_field_edit', survey_id=survey.id, field_id=field.id) }}">Edit</a>
+                </td>
+                <td><a class="btn btn-danger"
+                        href="{{ url_for('survey.get_survey_field_delete', survey_id=survey.id, field_id=field.id) }}">Delete</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</section>
+{% endblock %}

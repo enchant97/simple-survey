@@ -1,0 +1,34 @@
+{% extends "/base.html" %}
+{% block title %}Manage{% endblock %}
+{% block main %}
+<section class="mb-4">
+    <h3>Surveys</h3>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Expires</th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for survey in surveys %}
+            <tr>
+                <td>{{ survey.title }}</td>
+                <td>{% if survey.expires_at %}{{ survey.expires_at }}{% else %}Never{% endif %}</td>
+                <td><a class="btn btn-outline-dark" href="{{ url_for('survey.get_survey', survey_id=survey.id) }}">View</a></td>
+                <td><a class="btn btn-outline-dark"
+                        href="{{ url_for('survey.get_survey_report', survey_id=survey.id) }}">Report</a></td>
+                <td><a class="btn btn-outline-dark" href="{{ url_for('survey.get_survey_edit', survey_id=survey.id) }}">Edit</a>
+                </td>
+                <td><a class="btn btn-danger" href="{{ url_for('survey.get_survey_delete', survey_id=survey.id) }}">Delete</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</section>
+{% endblock %}

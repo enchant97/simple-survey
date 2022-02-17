@@ -5,25 +5,25 @@ from quart import (Blueprint, abort, current_app, flash, jsonify, redirect,
 from tortoise.exceptions import DoesNotExist, ValidationError
 
 from ..database.models import (Field, FieldOption, FieldOptionVote, FieldValue,
-                               Poll)
+                               Survey)
 from ..types import FieldOptionTypes, FieldTypes
 
-blueprint = Blueprint("poll", __name__)
+blueprint = Blueprint("survey", __name__)
 
 
 @blueprint.get("/")
-async def get_manage_polls():
-    polls = await Poll.all()
-    return await render_template("/poll/manage.html", polls=polls)
+async def get_manage_surveys():
+    surveys = await Survey.all()
+    return await render_template("/survey/manage.html", surveys=surveys)
 
 
 @blueprint.get("/new")
-async def get_new_poll():
-    return await render_template("/poll/new.html")
+async def get_new_survey():
+    return await render_template("/survey/new.html")
 
 
 @blueprint.post("/new")
-async def post_new_poll():
+async def post_new_survey():
     try:
         form = await request.form
         title = form["title"].strip()
@@ -33,60 +33,60 @@ async def post_new_poll():
         if expires_at is not None and expires_at != "":
             expires_at = datetime.fromisoformat(expires_at)
             if expires_at < datetime.now():
-                await flash("Failed to create poll as 'expiry' is in the past", "danger")
-                return redirect(url_for(".get_new_poll"))
+                await flash("Failed to create survey as 'expiry' is in the past", "danger")
+                return redirect(url_for(".get_new_survey"))
         else:
             expires_at = None
 
-        poll = await Poll.create(
+        survey = await Survey.create(
             title=title,
             description=description,
             expires_at=expires_at,
         )
     except (KeyError, ValueError, ValidationError):
-        await flash("Failed to create poll", "danger")
-        return redirect(url_for(".get_new_poll"))
+        await flash("Failed to create survey", "danger")
+        return redirect(url_for(".get_new_survey"))
     else:
-        await flash("Created poll", "success")
-        return redirect(url_for(".get_poll_edit", poll_id=poll.id))
+        await flash("Created survey", "success")
+        return redirect(url_for(".get_survey_edit", survey_id=survey.id))
 
 
-@blueprint.get("/<int:poll_id>")
-async def get_poll(poll_id: int):
+@blueprint.get("/<int:survey_id>")
+async def get_survey(survey_id: int):
     try:
-        poll = await Poll.get(id=poll_id)
-        if poll.has_expired:
-            await poll.delete()
-            await flash("Poll has expired!", "danger")
+        survey = await Survey.get(id=survey_id)
+        if survey.has_expired:
+            await survey.delete()
+            await flash("Survey has expired!", "danger")
             abort(404)
 
-        fields = await poll.fields.all().prefetch_related("options")
+        fields = await survey.fields.all().prefetch_related("options")
 
     except DoesNotExist:
         abort(404)
     else:
         return await render_template(
-            "/poll/view.html",
-            poll=poll,
+            "/survey/view.html",
+            survey=survey,
             fields=fields,
             FieldTypes=FieldTypes,
         )
 
 
-@blueprint.post("<int:poll_id>/vote")
-async def post_poll_vote(poll_id: int):
+@blueprint.post("<int:survey_id>/vote")
+async def post_survey_vote(survey_id: int):
     try:
-        poll = await Poll.get(id=poll_id)
-        if poll.has_expired:
-            await poll.delete()
-            await flash("poll has expired!", "danger")
+        survey = await Survey.get(id=survey_id)
+        if survey.has_expired:
+            await survey.delete()
+            await flash("survey has expired!", "danger")
             abort(404)
 
         form = await request.form
         to_commit = []
 
         for key, value in form.items():
-            field = await poll.fields.filter(id=key).get()
+            field = await survey.fields.filter(id=key).get()
             try:
                 FieldOptionTypes(field.field_type.value)
                 option = await field.options.filter(id=value).get()
@@ -107,44 +107,44 @@ async def post_poll_vote(poll_id: int):
                 else:
                     abort(404)
 
-        # this makes sure only the whole poll is filled in
+        # this makes sure only the whole survey is filled in
         for row in to_commit:
             await row.save()
 
     except DoesNotExist:
         abort(404)
     else:
-        return redirect(url_for(".get_poll_thanks", poll_id=poll_id))
+        return redirect(url_for(".get_survey_thanks", survey_id=survey_id))
 
 
-@blueprint.get("/<int:poll_id>/thanks")
-async def get_poll_thanks(poll_id: int):
+@blueprint.get("/<int:survey_id>/thanks")
+async def get_survey_thanks(survey_id: int):
     try:
-        poll = await Poll.get(id=poll_id)
+        survey = await Survey.get(id=survey_id)
     except DoesNotExist:
         abort(404)
     else:
-        return await render_template("/poll/thanks.html", poll=poll)
+        return await render_template("/survey/thanks.html", survey=survey)
 
 
-@blueprint.get("/<int:poll_id>/report")
-async def get_poll_report(poll_id: int):
+@blueprint.get("/<int:survey_id>/report")
+async def get_survey_report(survey_id: int):
     try:
-        poll = await Poll.get(id=poll_id)
-        fields = await poll.fields.all().prefetch_related("options", "options__votes", "values")
+        survey = await Survey.get(id=survey_id)
+        fields = await survey.fields.all().prefetch_related("options", "options__votes", "values")
     except DoesNotExist:
         abort(404)
     else:
         return await render_template(
-            "/poll/report.html",
-            poll=poll,
+            "/survey/report.html",
+            survey=survey,
             fields=fields,
             FieldTypes=FieldTypes,
         )
 
 
-@blueprint.get("/<int:poll_id>/report.csv")
-async def get_poll_report_csv(poll_id: int):
+@blueprint.get("/<int:survey_id>/report.csv")
+async def get_survey_report_csv(survey_id: int):
     def generate(choices: list[Choice]):
         yield "Caption, Votes\n"
         for choice in choices:
@@ -152,60 +152,60 @@ async def get_poll_report_csv(poll_id: int):
             votes = len(choice.votes)
             yield f"'{caption}', {votes}\n"
     try:
-        poll = await Question.get(id=poll_id)
-        choices = await poll.choices.all().prefetch_related("votes")
+        survey = await Question.get(id=survey_id)
+        choices = await survey.choices.all().prefetch_related("votes")
     except DoesNotExist:
         abort(404)
     else:
         return current_app.response_class(generate(choices), mimetype="text/csv")
 
 
-@blueprint.get("/<int:poll_id>/report.json")
-async def get_poll_report_json(poll_id: int):
+@blueprint.get("/<int:survey_id>/report.json")
+async def get_survey_report_json(survey_id: int):
     try:
-        poll = await Question.get(id=poll_id)
-        choices = [choice.dict() for choice in await PChoice.from_queryset(poll.choices.all())]
+        survey = await Question.get(id=survey_id)
+        choices = [choice.dict() for choice in await PChoice.from_queryset(survey.choices.all())]
     except DoesNotExist:
         abort(404)
     else:
         return jsonify(choices)
 
 
-@blueprint.get("/<int:poll_id>/report/with-meta.json")
-async def get_poll_report_json_with_meta(poll_id: int):
+@blueprint.get("/<int:survey_id>/report/with-meta.json")
+async def get_survey_report_json_with_meta(survey_id: int):
     try:
-        choices = (await PQuestion.from_queryset_single(Question.get(id=poll_id))).dict()
+        choices = (await PQuestion.from_queryset_single(Question.get(id=survey_id))).dict()
     except DoesNotExist:
         abort(404)
     else:
         return jsonify(choices)
 
 
-@blueprint.get("/<int:poll_id>/edit")
-async def get_poll_edit(poll_id: int):
+@blueprint.get("/<int:survey_id>/edit")
+async def get_survey_edit(survey_id: int):
     try:
-        poll = await Poll.get(id=poll_id)
-        fields = await poll.fields.all()
+        survey = await Survey.get(id=survey_id)
+        fields = await survey.fields.all()
     except DoesNotExist:
         abort(404)
     else:
-        return await render_template("/poll/edit.html", poll=poll, fields=fields)
+        return await render_template("/survey/edit.html", survey=survey, fields=fields)
 
 
-@blueprint.get("/<int:poll_id>/delete")
-async def get_poll_delete(poll_id: int):
+@blueprint.get("/<int:survey_id>/delete")
+async def get_survey_delete(survey_id: int):
     try:
-        poll = await Poll.get(id=poll_id)
-        await poll.delete()
-        await flash("Deleted poll", "success")
+        survey = await Survey.get(id=survey_id)
+        await survey.delete()
+        await flash("Deleted survey", "success")
     except DoesNotExist:
         abort(404)
     else:
-        return redirect(url_for(".get_manage_polls"))
+        return redirect(url_for(".get_manage_surveys"))
 
 
-@blueprint.post("/<int:poll_id>/edit")
-async def post_poll_edit(poll_id: int):
+@blueprint.post("/<int:survey_id>/edit")
+async def post_survey_edit(survey_id: int):
     try:
         form = await request.form
         title = form["title"]
@@ -219,47 +219,47 @@ async def post_poll_edit(poll_id: int):
         else:
             expires_at = None
 
-        poll = await Question.get(id=poll_id)
-        poll.title = title
-        poll.description = description
-        poll.expires_at = expires_at
-        await poll.save()
+        survey = await Question.get(id=survey_id)
+        survey.title = title
+        survey.description = description
+        survey.expires_at = expires_at
+        await survey.save()
     except (KeyError, ValueError, ValidationError):
-        await flash("Failed to update poll", "danger")
-        return redirect(url_for(".get_poll_edit", poll_id=poll_id))
+        await flash("Failed to update survey", "danger")
+        return redirect(url_for(".get_survey_edit", survey_id=survey_id))
     except DoesNotExist:
         abort(404)
     else:
-        await flash("Updated poll", "success")
-        return redirect(url_for(".get_poll_edit", poll_id=poll_id))
+        await flash("Updated survey", "success")
+        return redirect(url_for(".get_survey_edit", survey_id=survey_id))
 
 
-@blueprint.get("/<int:poll_id>/edit/field/new")
-async def get_poll_field_new(poll_id: int):
+@blueprint.get("/<int:survey_id>/edit/field/new")
+async def get_survey_field_new(survey_id: int):
     try:
-        poll = await Poll.get(id=poll_id)
+        survey = await Survey.get(id=survey_id)
         field_types = [type_.value for type_ in FieldTypes]
     except DoesNotExist:
         abort(404)
     else:
         return await render_template(
-            "/poll/field-new.html",
-            poll=poll,
+            "/survey/field-new.html",
+            survey=survey,
             field_types=field_types
         )
 
 
-@blueprint.post("/<int:poll_id>/edit/field/new")
-async def post_poll_field_new(poll_id: int):
+@blueprint.post("/<int:survey_id>/edit/field/new")
+async def post_survey_field_new(survey_id: int):
     try:
-        poll = await Poll.get(id=poll_id)
+        survey = await Survey.get(id=survey_id)
         form = await request.form
         caption = form["caption"].strip()
         field_type = FieldTypes(form["field-type"])
         required = form.get("required", False, bool)
 
         field = await Field.create(
-            poll=poll,
+            survey=survey,
             caption=caption,
             field_type=field_type,
             required=required,
@@ -270,25 +270,25 @@ async def post_poll_field_new(poll_id: int):
         try:
             _ = FieldOptionTypes(field_type.value)
             return redirect(url_for(
-                ".get_poll_field_edit",
-                poll_id=poll_id,
+                ".get_survey_field_edit",
+                survey_id=survey_id,
                 field_id=field.id
             ))
         except ValueError:
-            return redirect(url_for(".get_poll_edit", poll_id=poll_id))
+            return redirect(url_for(".get_survey_edit", survey_id=survey_id))
 
     except KeyError:
         await flash("Failed to add new field", "danger")
-        return redirect(url_for(".get_poll_field_new", poll_id=poll_id))
+        return redirect(url_for(".get_survey_field_new", survey_id=survey_id))
     except DoesNotExist:
         abort(404)
 
 
-@blueprint.get("/<int:poll_id>/edit/field/<int:field_id>/edit")
-async def get_poll_field_edit(poll_id: int, field_id: int):
+@blueprint.get("/<int:survey_id>/edit/field/<int:field_id>/edit")
+async def get_survey_field_edit(survey_id: int, field_id: int):
     try:
-        poll = await Poll.get(id=poll_id)
-        field: Field = await poll.fields.filter(id=field_id).get()
+        survey = await Survey.get(id=survey_id)
+        field: Field = await survey.fields.filter(id=field_id).get()
         field_types = [type_.value for type_ in FieldTypes]
 
         try:
@@ -303,8 +303,8 @@ async def get_poll_field_edit(poll_id: int, field_id: int):
         abort(404)
     else:
         return await render_template(
-            "poll/field-edit.html",
-            poll=poll,
+            "survey/field-edit.html",
+            survey=survey,
             field=field,
             field_types=field_types,
             allow_options=allow_options,
@@ -312,11 +312,11 @@ async def get_poll_field_edit(poll_id: int, field_id: int):
         )
 
 
-@blueprint.post("/<int:poll_id>/edit/field/<int:field_id>/edit")
-async def post_poll_field_edit(poll_id: int, field_id: int):
+@blueprint.post("/<int:survey_id>/edit/field/<int:field_id>/edit")
+async def post_survey_field_edit(survey_id: int, field_id: int):
     try:
-        poll = await Poll.get(id=poll_id)
-        field = await poll.fields.filter(id=field_id).get()
+        survey = await Survey.get(id=survey_id)
+        field = await survey.fields.filter(id=field_id).get()
 
         form = await request.form
 
@@ -327,14 +327,14 @@ async def post_poll_field_edit(poll_id: int, field_id: int):
         await field.save()
 
         await flash("Updated field", "success")
-        return redirect(url_for(".get_poll_edit", poll_id=poll_id))
+        return redirect(url_for(".get_survey_edit", survey_id=survey_id))
 
     except DoesNotExist:
         abort(404)
 
 
-@blueprint.get("/<int:poll_id>/edit/field/<int:field_id>/delete")
-async def get_poll_field_delete(poll_id: int, field_id: int):
+@blueprint.get("/<int:survey_id>/edit/field/<int:field_id>/delete")
+async def get_survey_field_delete(survey_id: int, field_id: int):
     try:
         field = await Field.get(id=field_id)
         await field.delete()
@@ -342,51 +342,51 @@ async def get_poll_field_delete(poll_id: int, field_id: int):
     except DoesNotExist:
         abort(404)
     else:
-        return redirect(url_for(".get_poll_edit", poll_id=poll_id))
+        return redirect(url_for(".get_survey_edit", survey_id=survey_id))
 
 
-@blueprint.get("/<int:poll_id>/edit/field/<int:field_id>/new-option")
-async def get_poll_field_new_option(poll_id: int, field_id: int):
+@blueprint.get("/<int:survey_id>/edit/field/<int:field_id>/new-option")
+async def get_survey_field_new_option(survey_id: int, field_id: int):
     try:
-        poll = await Poll.get(id=poll_id)
-        field = await poll.fields.filter(id=field_id).get()
+        survey = await Survey.get(id=survey_id)
+        field = await survey.fields.filter(id=field_id).get()
 
     except DoesNotExist:
         abort(404)
     else:
         return await render_template(
-            "poll/option-new.html",
-            poll=poll,
+            "survey/option-new.html",
+            survey=survey,
             field=field,
         )
 
 
-@blueprint.post("/<int:poll_id>/edit/field/<int:field_id>/new-option")
-async def post_poll_field_new_option(poll_id: int, field_id: int):
+@blueprint.post("/<int:survey_id>/edit/field/<int:field_id>/new-option")
+async def post_survey_field_new_option(survey_id: int, field_id: int):
     try:
-        poll = await Poll.get(id=poll_id)
-        field = await poll.fields.filter(id=field_id).get()
+        survey = await Survey.get(id=survey_id)
+        field = await survey.fields.filter(id=field_id).get()
 
         caption = (await request.form)["caption"].strip()
 
         await FieldOption.create(field=field, caption=caption)
 
         await flash("Created new field option", "success")
-        return redirect(url_for('poll.get_poll_field_edit', poll_id=poll.id, field_id=field.id))
+        return redirect(url_for('survey.get_survey_field_edit', survey_id=survey.id, field_id=field.id))
 
     except DoesNotExist:
         abort(404)
 
 
-@blueprint.get("/<int:poll_id>/edit/field/<int:field_id>/<int:option_id>/delete")
-async def get_poll_field_option_delete(poll_id: int, field_id: int, option_id: int):
+@blueprint.get("/<int:survey_id>/edit/field/<int:field_id>/<int:option_id>/delete")
+async def get_survey_field_option_delete(survey_id: int, field_id: int, option_id: int):
     try:
-        poll = await Poll.get(id=poll_id)
-        field: Field = await poll.fields.filter(id=field_id).get()
+        survey = await Survey.get(id=survey_id)
+        field: Field = await survey.fields.filter(id=field_id).get()
         await field.options.filter(id=option_id).delete()
 
         await flash("Deleted field option", "success")
-        return redirect(url_for('poll.get_poll_field_edit', poll_id=poll.id, field_id=field.id))
+        return redirect(url_for('survey.get_survey_field_edit', survey_id=survey.id, field_id=field.id))
 
     except DoesNotExist:
         abort(404)

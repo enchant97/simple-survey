@@ -7,7 +7,7 @@ from secrets import token_urlsafe
 class Settings(BaseSettings):
     DB_URI: str
     SECRET_KEY: Optional[str] = token_urlsafe(32)
-    TITLE_NAME: Optional[str] = "Simple Polls"
+    TITLE_NAME: Optional[str] = "Simple Surveys"
 
     class Config:
         case_sensitive = True

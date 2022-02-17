@@ -1,7 +1,7 @@
 {% extends "/base.html" %}
 {% block title %}Field Edit{% endblock %}
 {% block main %}
-<form class="mb-3" action="{{ url_for('poll.post_poll_field_edit', poll_id=poll.id, field_id=field.id) }}"
+<form class="mb-3" action="{{ url_for('survey.post_survey_field_edit', survey_id=survey.id, field_id=field.id) }}"
     method="post">
     <div class="mb-3 form-floating">
         <input class="form-control" type="text" name="caption" id="field-caption" maxlength="100"
@@ -20,14 +20,14 @@
         <label class="form-check-label" for="field-required">Required</label>
     </div>
     <button class="btn btn-primary" type="submit">Save</button>
-    <a class="btn btn-danger" href="{{ url_for('poll.get_poll_edit', poll_id=poll.id) }}">Cancel</a>
+    <a class="btn btn-danger" href="{{ url_for('survey.get_survey_edit', survey_id=survey.id) }}">Cancel</a>
 </form>
 
 {% if allow_options %}
 <div class="mb-3">
     <h2>Options</h2>
     <a class="mb-3 btn btn-primary"
-        href="{{ url_for('poll.get_poll_field_new_option', poll_id=poll.id, field_id=field.id) }}">New Option</a>
+        href="{{ url_for('survey.get_survey_field_new_option', survey_id=survey.id, field_id=field.id) }}">New Option</a>
     <table class="table">
         <thead>
             <tr>
@@ -40,7 +40,7 @@
             <tr>
                 <td>{{ option.caption }}</td>
                 <td><a class="btn btn-danger"
-                        href="{{ url_for('poll.get_poll_field_option_delete', poll_id=poll.id, field_id=field.id, option_id=option.id) }}">Delete</a>
+                        href="{{ url_for('survey.get_survey_field_option_delete', survey_id=survey.id, field_id=field.id, option_id=option.id) }}">Delete</a>
                 </td>
             </tr>
             {% endfor %}

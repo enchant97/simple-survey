@@ -1,5 +1,5 @@
 {% extends "/base.html" %}
-{% block title %}{{ poll.title }} - Analytics{% endblock %}
+{% block title %}{{ survey.title }} - Analytics{% endblock %}
 {% block main %}
 <nav class="d-flex justify-content-center" aria-label="page section navigation">
     <ul class="pagination pagination-sm">
@@ -13,14 +13,14 @@
 <section class="mb-4" id="section-downloads">
     <h3>Downloads</h3>
     <div class="d-flex flex-wrap gap-2 justify-content-center">
-        <a class="btn btn-outline-dark" href="{{ url_for('poll.get_poll_report_csv', poll_id=poll.id) }}"
-            download="{{ poll.title }}.csv">Download
+        <a class="btn btn-outline-dark" href="{{ url_for('survey.get_survey_report_csv', survey_id=survey.id) }}"
+            download="{{ survey.title }}.csv">Download
             CSV</a>
-        <a class="btn btn-outline-dark" href="{{ url_for('poll.get_poll_report_json', poll_id=poll.id) }}"
-            download="{{ poll.title }}.json">Download
+        <a class="btn btn-outline-dark" href="{{ url_for('survey.get_survey_report_json', survey_id=survey.id) }}"
+            download="{{ survey.title }}.json">Download
             JSON</a>
-        <a class="btn btn-outline-dark" href="{{ url_for('poll.get_poll_report_json_with_meta', poll_id=poll.id) }}"
-            download="{{ poll.title }}.json">Download
+        <a class="btn btn-outline-dark" href="{{ url_for('survey.get_survey_report_json_with_meta', survey_id=survey.id) }}"
+            download="{{ survey.title }}.json">Download
             JSON (With Meta)</a>
     </div>
 </section>
@@ -31,15 +31,15 @@
         <tbody>
             <tr>
                 <th>Title</th>
-                <td>{{ poll.title }}</td>
+                <td>{{ survey.title }}</td>
             </tr>
             <tr>
                 <th>Description</th>
-                <td>{{ poll.description }}</td>
+                <td>{{ survey.description }}</td>
             </tr>
             <tr>
                 <th>Expires</th>
-                <td>{% if poll.expires_at %}{{ poll.expires_at }}{% else %}Never{% endif %}</td>
+                <td>{% if survey.expires_at %}{{ survey.expires_at }}{% else %}Never{% endif %}</td>
             </tr>
         </tbody>
     </table>
@@ -83,6 +83,6 @@
 </nav>
 
 <script>
-    // load_report_graphs("{{ url_for('poll.get_poll_report_json', poll_id=poll.id) }}")
+    // load_report_graphs("{{ url_for('survey.get_survey_report_json', survey_id=survey.id) }}")
 </script>
 {% endblock %}

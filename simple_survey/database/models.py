@@ -10,9 +10,9 @@ from tortoise.models import Model
 from ..types import FieldTypes
 
 
-class Poll(Model):
+class Survey(Model):
     """
-    Information related to a created poll
+    Information related to a created survey
     """
     title = CharField(max_length=100)
     description = CharField(max_length=200)
@@ -32,10 +32,10 @@ class Poll(Model):
 
 class Field(Model):
     """
-    A poll's field (either a group of options or a value)
+    A survey's field (either a group of options or a value)
     """
-    poll: ForeignKeyRelation[Poll] = ForeignKeyField(
-        "models.Poll", "fields")
+    survey: ForeignKeyRelation[Survey] = ForeignKeyField(
+        "models.Survey", "fields")
     caption = CharField(max_length=200)
     field_type = CharEnumField(FieldTypes)
     required = BooleanField(default=True)
@@ -44,7 +44,7 @@ class Field(Model):
     options = ReverseRelation["FieldOption"]
 
     class PydanticMeta:
-        exclude = ["poll"]
+        exclude = ["survey"]
 
 
 class FieldValue(Model):
@@ -89,7 +89,7 @@ class FieldOptionVote(Model):
 # init models early, so pydantic can see relationships
 Tortoise.init_models([__name__], "models")
 
-PPoll = pydantic_model_creator(Poll)
+PSurvey = pydantic_model_creator(Survey)
 PField = pydantic_model_creator(Field)
 PFieldValue = pydantic_model_creator(FieldValue)
 PFieldOption = pydantic_model_creator(FieldOption)

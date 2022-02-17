@@ -1,7 +1,7 @@
 {% extends "/base.html" %}
 {% block title %}New Option{% endblock %}
 {% block main %}
-<form action="{{ url_for('poll.post_poll_field_new_option', poll_id=poll.id, field_id=field.id) }}" method="post">
+<form action="{{ url_for('survey.post_survey_field_new_option', survey_id=survey.id, field_id=field.id) }}" method="post">
     <div class="mb-3 form-floating">
         <input class="form-control" type="text" name="caption" id="field-option-caption" maxlength="100"
             placeholder="The Caption" required>
@@ -9,6 +9,6 @@
     </div>
     <button class="btn btn-primary" type="submit">Create</button>
     <a class="btn btn-danger"
-        href="{{ url_for('poll.get_poll_field_edit', poll_id=poll.id, field_id=field.id) }}">Cancel</a>
+        href="{{ url_for('survey.get_survey_field_edit', survey_id=survey.id, field_id=field.id) }}">Cancel</a>
 </form>
 {% endblock %}

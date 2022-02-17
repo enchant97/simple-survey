@@ -1,1 +1,1 @@
-# Simple Polls
+# Simple Surveys
