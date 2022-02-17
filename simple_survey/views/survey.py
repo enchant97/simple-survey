@@ -245,7 +245,8 @@ async def get_survey_field_new(survey_id: int):
         return await render_template(
             "/survey/field-new.html",
             survey=survey,
-            field_types=field_types
+            field_types=field_types,
+            add_another=request.args.get("add_another", False, bool),
         )
 
 
@@ -266,6 +267,14 @@ async def post_survey_field_new(survey_id: int):
         )
 
         await flash("Created new field", "success")
+
+        if form.get("form-add-another", False, bool):
+            # allow for going back to "add new" form when mass creating
+            return redirect(url_for(
+                ".get_survey_field_new",
+                survey_id=survey_id,
+                add_another="1"
+            ))
 
         try:
             _ = FieldOptionTypes(field_type.value)
@@ -358,6 +367,7 @@ async def get_survey_field_new_option(survey_id: int, field_id: int):
             "survey/option-new.html",
             survey=survey,
             field=field,
+            add_another=request.args.get("add_another", False, bool),
         )
 
 
@@ -367,12 +377,27 @@ async def post_survey_field_new_option(survey_id: int, field_id: int):
         survey = await Survey.get(id=survey_id)
         field = await survey.fields.filter(id=field_id).get()
 
-        caption = (await request.form)["caption"].strip()
+        form = await request.form
+        caption = form["caption"].strip()
 
         await FieldOption.create(field=field, caption=caption)
 
         await flash("Created new field option", "success")
-        return redirect(url_for('survey.get_survey_field_edit', survey_id=survey.id, field_id=field.id))
+
+        if form.get("form-add-another", False, bool):
+            # allow for going back to "add new" form when mass creating
+            return redirect(url_for(
+                ".get_survey_field_new_option",
+                survey_id=survey_id,
+                field_id=field_id,
+                add_another="1"
+            ))
+
+        return redirect(url_for(
+            "survey.get_survey_field_edit",
+            survey_id=survey.id,
+            field_id=field.id
+        ))
 
     except DoesNotExist:
         abort(404)

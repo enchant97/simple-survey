@@ -3,7 +3,8 @@
 {% block main %}
 <form action="" method="post">
     <div class="mb-3 form-floating">
-        <input class="form-control" type="text" name="caption" id="field-caption" maxlength="100" placeholder="The Field Caption" required autofocus>
+        <input class="form-control" type="text" name="caption" id="field-caption" maxlength="100"
+            placeholder="The Field Caption" required autofocus>
         <label for="field-caption">Caption</label>
     </div>
     <select class="mb-3 form-select" name="field-type" id="field-type" aria-label="The Field Type" required>
@@ -11,10 +12,15 @@
         {% for value in field_types %}
         <option value="{{ value }}">{{ value }}</option>
         {% endfor %}
-      </select>
+    </select>
     <div class="mb-3 form-check">
         <input class="form-check-input" type="checkbox" name="required" id="field-required" value="1" checked>
         <label class="form-check-label" for="field-required">Required</label>
+    </div>
+    <div class="mb-3 form-check">
+        <input class="form-check-input" type="checkbox" name="form-add-another" id="form-add-another" value="1" {% if
+            add_another %}checked{%endif%}>
+        <label class="form-check-label" for="form-add-another">Add Another</label>
     </div>
     <a class="btn btn-outline-dark" href="{{ url_for('survey.get_survey_edit', survey_id=survey.id) }}">Cancel</a>
     <button class="btn btn-primary" type="submit">Create</button>
