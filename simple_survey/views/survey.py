@@ -147,19 +147,37 @@ async def get_survey_report(survey_id: int):
 
 @blueprint.get("/<int:survey_id>/report.csv")
 async def get_survey_report_csv(survey_id: int):
-    def generate(choices: list[Choice]):
-        yield "Caption, Votes\n"
-        for choice in choices:
-            caption = choice.caption
-            votes = len(choice.votes)
-            yield f"'{caption}', {votes}\n"
+    def generate(fields: list[Field]):
+        yield "Response ID, Field Caption, Field Type, Value, When\n"
+
+        for field in fields:
+            try:
+                # process fields with options
+                FieldOptionTypes(field.field_type.value)
+
+                for option in field.options:
+                    for vote in option.votes:
+                        yield (f"{vote.response.id}, '{field.caption}', " +
+                               f"{field.field_type.value},{option.caption}, " +
+                               f"{vote.response.when}\n")
+            except ValueError:
+                # process fields with values
+                for value in field.values:
+                    yield (f"{value.response.id}, '{field.caption}', " +
+                           f"{field.field_type.value}, '{value.value}', " +
+                           f"{vote.response.when}\n")
+
     try:
-        survey = await Question.get(id=survey_id)
-        choices = await survey.choices.all().prefetch_related("votes")
+        survey = await Survey.get(id=survey_id)
+        fields = await survey.fields.all().prefetch_related(
+            "options", "options__votes",
+            "options__votes__response",
+            "values", "values__response",
+        )
     except DoesNotExist:
         abort(404)
     else:
-        return current_app.response_class(generate(choices), mimetype="text/csv")
+        return current_app.response_class(generate(fields), mimetype="text/csv")
 
 
 @blueprint.get("/<int:survey_id>/report.json")
