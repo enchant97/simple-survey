@@ -1,5 +1,27 @@
 "use strict";
 
+// hand picked 'nice' colors
+const NICE_COLORS = [
+    "#b50000", // red
+    "#b56400", // orange
+    "#a6b500", // yellow
+    "#00b500", // green
+    "#00b59a", // cyan
+    "#008bb5", // light-blue
+    "#0000b5", // blue
+    "#6100b5", // violet
+    "#9100b5", // pink
+    "#b5006d", // rose
+];
+
+// shuffle using the 'Schwartzian transform', but random
+function shuffle(array) {
+    return array.map(value => ({ value, sort: Math.random() }))
+        .sort((a, b) => a.sort - b.sort)
+        .map(({ value }) => value);
+}
+
+// returns a random hex color
 function get_random_color() {
     let color = '#';
     for (let i = 0; i < 6; i++) {
@@ -19,14 +41,22 @@ async function fetch_json(url) {
 function load_votes_pie_chart(field_data, canvas_element) {
     var vote_counts = [];
     var option_names = [];
-    var colors = [];
+    var colors = NICE_COLORS;
 
     field_data.options.forEach(option => {
         option_names.push(option.caption);
         vote_counts.push(option.votes.length);
-        // TODO replace this with pre-defined colors
-        colors.push(get_random_color());
     });
+
+    // if hand picked colors where not enough,
+    // randomly generate a color for each missing one
+    if (option_names.length > colors.length) {
+        while (option_names.length > colors.length) {
+            colors.push(get_random_color());
+        }
+    }
+
+    colors = shuffle(colors);
 
     new Chart(
         canvas_element,

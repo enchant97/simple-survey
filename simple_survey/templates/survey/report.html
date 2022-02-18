@@ -113,6 +113,8 @@
 </nav>
 
 <script>
-    load_report_graphs("{{ url_for('survey.get_survey_report_json', survey_id=survey.id) }}");
+    window.addEventListener("load", _ => {
+        load_report_graphs("{{ url_for('survey.get_survey_report_json', survey_id=survey.id) }}");
+    });
 </script>
 {% endblock %}
