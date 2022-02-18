@@ -6,7 +6,7 @@ from tortoise.exceptions import DoesNotExist, ValidationError
 from tortoise.transactions import atomic
 
 from ..database.models import (Field, FieldOption, FieldOptionVote, FieldValue,
-                               Survey, SurveyResponse, PFields, PSurvey)
+                               PFields, PSurvey, Survey, SurveyResponse)
 from ..types import FieldOptionTypes, FieldTypes
 
 blueprint = Blueprint("survey", __name__)
@@ -83,9 +83,18 @@ async def post_survey_vote(survey_id: int):
         for key, value in form.items():
             field = await survey.fields.filter(id=key).get()
             try:
-                FieldOptionTypes(field.field_type.value)
-                option = await field.options.filter(id=value).get()
-                await FieldOptionVote.create(response=response, option=option)
+                field_type = FieldOptionTypes(field.field_type.value)
+                if field_type == FieldOptionTypes.CHECK:
+                    # handle for when using a checkbox that
+                    # allows multiple options to be ticked
+                    checked_values = form.getlist(key, int)
+                    for check_value in checked_values:
+                        option = await field.options.filter(id=check_value).get()
+                        await FieldOptionVote.create(response=response, option=option)
+                else:
+                    # any option that only should have one choice
+                    option = await field.options.filter(id=value).get()
+                    await FieldOptionVote.create(response=response, option=option)
             except ValueError:
                 if field.field_type == FieldTypes.SHORT_TEXT:
                     await FieldValue.create(response=response, field=field, value=value.strip()[:60])
