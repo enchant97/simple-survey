@@ -1,13 +1,13 @@
 from enum import Enum
 
 
-class FieldOptionTypes(Enum):
+class FieldOptionTypes(str, Enum):
     RADIO = "radio"
     CHECK = "check"
     DROP_DOWN = "drop-down"
 
 
-class FieldValueTypes(Enum):
+class FieldValueTypes(str, Enum):
     SHORT_TEXT = "short-text"
     LONG_TEXT = "long-text"
     EMAIL = "email"
@@ -15,7 +15,7 @@ class FieldValueTypes(Enum):
     INTEGER = "integer"
 
 
-class FieldTypes(Enum):
+class FieldTypes(str, Enum):
     RADIO = "radio"
     CHECK = "check"
     DROP_DOWN = "drop-down"

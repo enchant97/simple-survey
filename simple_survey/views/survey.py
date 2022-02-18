@@ -6,7 +6,7 @@ from tortoise.exceptions import DoesNotExist, ValidationError
 from tortoise.transactions import atomic
 
 from ..database.models import (Field, FieldOption, FieldOptionVote, FieldValue,
-                               Survey, SurveyResponse)
+                               Survey, SurveyResponse, PFields, PSurvey)
 from ..types import FieldOptionTypes, FieldTypes
 
 blueprint = Blueprint("survey", __name__)
@@ -174,22 +174,22 @@ async def get_survey_report_csv(survey_id: int):
 @blueprint.get("/<int:survey_id>/report.json")
 async def get_survey_report_json(survey_id: int):
     try:
-        survey = await Question.get(id=survey_id)
-        choices = [choice.dict() for choice in await PChoice.from_queryset(survey.choices.all())]
+        survey = await Survey.get(id=survey_id)
+        fields = await PFields.from_queryset(survey.fields.all())
     except DoesNotExist:
         abort(404)
     else:
-        return jsonify(choices)
+        return fields.json()
 
 
 @blueprint.get("/<int:survey_id>/report/with-meta.json")
 async def get_survey_report_json_with_meta(survey_id: int):
     try:
-        choices = (await PQuestion.from_queryset_single(Question.get(id=survey_id))).dict()
+        survey = await PSurvey.from_queryset_single(Survey.get(id=survey_id))
     except DoesNotExist:
         abort(404)
     else:
-        return jsonify(choices)
+        return survey.json()
 
 
 @blueprint.get("/<int:survey_id>/edit")

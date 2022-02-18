@@ -1,7 +1,8 @@
 from datetime import datetime
 
 from tortoise import Tortoise, timezone
-from tortoise.contrib.pydantic import pydantic_model_creator
+from tortoise.contrib.pydantic import (pydantic_model_creator,
+                                       pydantic_queryset_creator)
 from tortoise.fields import (BooleanField, CharEnumField, CharField,
                              DatetimeField, ForeignKeyField,
                              ForeignKeyRelation, IntField, ReverseRelation)
@@ -35,6 +36,9 @@ class Survey(Model):
         if timezone.now() <= self.closes_at:
             return False
         return True
+
+    class PydanticMeta:
+        exclude = ["responses"]
 
 
 class Field(Model):
@@ -93,6 +97,9 @@ class FieldValue(Model):
         "models.Field", "values")
     value = CharField(255)
 
+    class PydanticMeta:
+        exclude = ["response", "field"]
+
 
 class FieldOptionVote(Model):
     """
@@ -105,15 +112,11 @@ class FieldOptionVote(Model):
 
 
     class PydanticMeta:
-        exclude = ["option"]
+        exclude = ["response", "option"]
 
 
 # init models early, so pydantic can see relationships
 Tortoise.init_models([__name__], "models")
 
 PSurvey = pydantic_model_creator(Survey)
-PField = pydantic_model_creator(Field)
-PFieldOption = pydantic_model_creator(FieldOption)
-PSurveyResponse = pydantic_model_creator(SurveyResponse)
-PFieldValue = pydantic_model_creator(FieldValue)
-PFieldFieldOptionVote = pydantic_model_creator(FieldOptionVote)
+PFields = pydantic_queryset_creator(Field)
