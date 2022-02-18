@@ -7,7 +7,7 @@
         <thead>
             <tr>
                 <th>Title</th>
-                <th>Expires</th>
+                <th>Closes At</th>
                 <th></th>
                 <th></th>
                 <th></th>
@@ -18,13 +18,17 @@
             {% for survey in surveys %}
             <tr>
                 <td>{{ survey.title }}</td>
-                <td>{% if survey.expires_at %}{{ survey.expires_at }}{% else %}Never{% endif %}</td>
-                <td><a class="btn btn-outline-dark" href="{{ url_for('survey.get_survey', survey_id=survey.id) }}">View</a></td>
+                <td {% if survey.is_closed %}class="bg-warning" title="survey closed" {% endif %}>{% if
+                    survey.closes_at %}{{ survey.closes_at }}{% else %}Never{% endif %}</td>
+                <td><a class="btn btn-outline-dark"
+                        href="{{ url_for('survey.get_survey', survey_id=survey.id) }}">View</a></td>
                 <td><a class="btn btn-outline-dark"
                         href="{{ url_for('survey.get_survey_report', survey_id=survey.id) }}">Report</a></td>
-                <td><a class="btn btn-outline-dark" href="{{ url_for('survey.get_survey_edit', survey_id=survey.id) }}">Edit</a>
+                <td><a class="btn btn-outline-dark"
+                        href="{{ url_for('survey.get_survey_edit', survey_id=survey.id) }}">Edit</a>
                 </td>
-                <td><a class="btn btn-danger" href="{{ url_for('survey.get_survey_delete', survey_id=survey.id) }}">Delete</a>
+                <td><a class="btn btn-danger"
+                        href="{{ url_for('survey.get_survey_delete', survey_id=survey.id) }}">Delete</a>
                 </td>
             </tr>
             {% endfor %}

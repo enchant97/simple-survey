@@ -3,8 +3,8 @@
 {% block main %}
 <nav class="d-flex justify-content-center" aria-label="management navigation">
     <ul class="pagination pagination-sm">
-        <li class="page-item"><a class="page-link"
-                href="{{ url_for('survey.get_survey', survey_id=survey.id) }}">View Survey</a></li>
+        <li class="page-item"><a class="page-link" href="{{ url_for('survey.get_survey', survey_id=survey.id) }}">View
+                Survey</a></li>
         <ul class="pagination pagination-sm">
             <li class="page-item disabled" aria-current="page"><a class="page-link"
                     href="{{ url_for('survey.get_survey_edit', survey_id=survey.id) }}">Edit Survey</a></li>
@@ -27,9 +27,9 @@
             <label for="survey-description">Description</label>
         </div>
         <div class="mb-3">
-            <label class="form-label" for="survey-expires_at">Expires</label>
-            <input class="form-control" type="datetime-local" name="expires_at" id="survey-expires_at" {% if
-                survey.expires_at %} value="{{ survey.expires_at }}" {% endif %}>
+            <label class="form-label" for="survey-closes_at">Closes At</label>
+            <input class="form-control" type="datetime-local" name="closes_at" id="survey-closes_at" {% if
+                survey.closes_at %} value="{{ survey.closes_at_as_html_input_value }}" {% endif %}>
         </div>
         <a class="btn btn-outline-dark" href="{{ url_for('survey.get_manage_surveys') }}">Cancel</a>
         <button class="btn btn-primary" type="submit">Save</button>

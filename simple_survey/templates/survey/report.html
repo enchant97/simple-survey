@@ -3,8 +3,8 @@
 {% block main %}
 <nav class="d-flex justify-content-center" aria-label="management navigation">
     <ul class="pagination pagination-sm">
-        <li class="page-item"><a class="page-link"
-                href="{{ url_for('survey.get_survey', survey_id=survey.id) }}">View Survey</a></li>
+        <li class="page-item"><a class="page-link" href="{{ url_for('survey.get_survey', survey_id=survey.id) }}">View
+                Survey</a></li>
         <ul class="pagination pagination-sm">
             <li class="page-item"><a class="page-link"
                     href="{{ url_for('survey.get_survey_edit', survey_id=survey.id) }}">Edit Survey</a></li>
@@ -31,7 +31,8 @@
         <a class="btn btn-outline-dark" href="{{ url_for('survey.get_survey_report_json', survey_id=survey.id) }}"
             download="{{ survey.title }}.json">Download
             JSON</a>
-        <a class="btn btn-outline-dark" href="{{ url_for('survey.get_survey_report_json_with_meta', survey_id=survey.id) }}"
+        <a class="btn btn-outline-dark"
+            href="{{ url_for('survey.get_survey_report_json_with_meta', survey_id=survey.id) }}"
             download="{{ survey.title }}.json">Download
             JSON (With Meta)</a>
     </div>
@@ -50,8 +51,9 @@
                 <td>{{ survey.description }}</td>
             </tr>
             <tr>
-                <th>Expires</th>
-                <td>{% if survey.expires_at %}{{ survey.expires_at }}{% else %}Never{% endif %}</td>
+                <th>Closes At</th>
+                <td {% if survey.is_closed %}class="bg-warning" title="survey closed" {% endif %}>{% if
+                    survey.closes_at %}{{ survey.closes_at }}{% else %}Never{% endif %}</td>
             </tr>
             <tr>
                 <th>Responses</th>

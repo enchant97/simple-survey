@@ -29,20 +29,17 @@ async def post_new_survey():
         form = await request.form
         title = form["title"].strip()
         description = form["description"].strip()
-        expires_at = form.get("expires_at")
+        closes_at = form.get("closes_at")
 
-        if expires_at is not None and expires_at != "":
-            expires_at = datetime.fromisoformat(expires_at)
-            if expires_at < datetime.now():
-                await flash("Failed to create survey as 'expiry' is in the past", "danger")
-                return redirect(url_for(".get_new_survey"))
+        if closes_at is not None and closes_at != "":
+            closes_at = datetime.fromisoformat(closes_at)
         else:
-            expires_at = None
+            closes_at = None
 
         survey = await Survey.create(
             title=title,
             description=description,
-            expires_at=expires_at,
+            closes_at=closes_at,
         )
     except (KeyError, ValueError, ValidationError):
         await flash("Failed to create survey", "danger")
@@ -56,11 +53,6 @@ async def post_new_survey():
 async def get_survey(survey_id: int):
     try:
         survey = await Survey.get(id=survey_id)
-        if survey.has_expired:
-            await survey.delete()
-            await flash("Survey has expired!", "danger")
-            abort(404)
-
         fields = await survey.fields.all().prefetch_related("options")
 
     except DoesNotExist:
@@ -79,9 +71,8 @@ async def get_survey(survey_id: int):
 async def post_survey_vote(survey_id: int):
     try:
         survey = await Survey.get(id=survey_id)
-        if survey.has_expired:
-            await survey.delete()
-            await flash("survey has expired!", "danger")
+        if survey.is_closed:
+            await flash("Survey is closed!", "danger")
             abort(404)
 
         form = await request.form
@@ -230,19 +221,17 @@ async def post_survey_edit(survey_id: int):
         form = await request.form
         title = form["title"]
         description = form["description"]
-        expires_at = form.get("expires_at")
+        closes_at = form.get("closes_at")
 
-        if expires_at is not None and expires_at != "":
-            expires_at = datetime.fromisoformat(expires_at)
-            if expires_at < datetime.now():
-                raise ValueError()
+        if closes_at is not None and closes_at != "":
+            closes_at = datetime.fromisoformat(closes_at)
         else:
-            expires_at = None
+            closes_at = None
 
         survey = await Survey.get(id=survey_id)
         survey.title = title
         survey.description = description
-        survey.expires_at = expires_at
+        survey.closes_at = closes_at
         await survey.save()
     except (KeyError, ValueError, ValidationError):
         await flash("Failed to update survey", "danger")
