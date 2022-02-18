@@ -94,6 +94,18 @@
 
 <section class="mb-4" id="section-charts">
     <h3>Charts</h3>
+    <div class="row" id="charts-by-votes">
+        {% for field in fields %}
+        {% if field.options %}
+        <div class="col-sm-6">
+            <div class="card border-dark mb-3">
+                <span role="heading" class="card-header">{{ field.caption }}</span>
+                <canvas class="card-body" id="chart-vote-{{ field.id }}"></canvas>
+            </div>
+        </div>
+        {% endif %}
+        {% endfor %}
+    </div>
 </section>
 
 <nav class="d-flex justify-content-center">
@@ -101,6 +113,6 @@
 </nav>
 
 <script>
-    // load_report_graphs("{{ url_for('survey.get_survey_report_json', survey_id=survey.id) }}")
+    load_report_graphs("{{ url_for('survey.get_survey_report_json', survey_id=survey.id) }}");
 </script>
 {% endblock %}

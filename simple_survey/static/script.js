@@ -16,14 +16,14 @@ async function fetch_json(url) {
     return await resp.json();
 }
 
-function load_votes_pie_chart(json_data, canvas_element) {
+function load_votes_pie_chart(field_data, canvas_element) {
     var vote_counts = [];
-    var choice_names = [];
+    var option_names = [];
     var colors = [];
 
-    json_data.forEach(choice => {
-        choice_names.push(choice.caption);
-        vote_counts.push(choice.votes.length);
+    field_data.options.forEach(option => {
+        option_names.push(option.caption);
+        vote_counts.push(option.votes.length);
         // TODO replace this with pre-defined colors
         colors.push(get_random_color());
     });
@@ -33,7 +33,7 @@ function load_votes_pie_chart(json_data, canvas_element) {
         {
             type: 'doughnut',
             data: {
-                labels: choice_names,
+                labels: option_names,
                 datasets: [
                     {
                         data: vote_counts,
@@ -49,8 +49,7 @@ function load_votes_pie_chart(json_data, canvas_element) {
                         position: 'top',
                     },
                     title: {
-                        display: true,
-                        text: 'All Votes'
+                        display: false,
                     }
                 },
                 hoverOffset: 10,
@@ -58,9 +57,16 @@ function load_votes_pie_chart(json_data, canvas_element) {
         });
 }
 
-async function load_report_graphs(url) {
-    let chart_votes_pie_canvas = document.getElementById("chart-votes-pie");
-    let json_data = await fetch_json(url);
+function load_votes_pie_charts(json_data) {
+    json_data.forEach(field => {
+        if (field.options.length != 0) {
+            let canvas_element = document.getElementById(`chart-vote-${field.id}`);
+            load_votes_pie_chart(field, canvas_element);
+        }
+    });
+}
 
-    load_votes_pie_chart(json_data, chart_votes_pie_canvas);
+async function load_report_graphs(url) {
+    let json_data = await fetch_json(url);
+    load_votes_pie_charts(json_data);
 }
