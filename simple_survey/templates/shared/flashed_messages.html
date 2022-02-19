@@ -1,8 +1,11 @@
 {% with messages = get_flashed_messages(with_categories=true) %}
 {% if messages %}
-<ul class="container list-unstyled">
+<ul class="toast-container sticky-top ms-auto list-unstyled">
     {% for category, message in messages %}
-    <li role="alert" class="alert alert-{{ category }}">{{ message }}</li>
+    <li class="toast fade show d-flex bg-{{ category }}" aria-live="polite" aria-atomic="true" role="alert">
+        <span class="toast-body">{{ message }}</span>
+        <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+    </li>
     {% endfor %}
 </ul>
 {% endif %}

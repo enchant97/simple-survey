@@ -16,6 +16,7 @@
 </head>
 
 <body>
+    {% include 'shared/flashed_messages.html' %}
     <header class="container mb-3">
         <div class="d-flex flex-wrap justify-content-center py-3 mb-4 border-bottom">
             <a class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-dark text-decoration-none"
@@ -27,7 +28,6 @@
         </div>
         <h2 class="text-center">{{ self.title() }}</h2>
     </header>
-    {% include 'shared/flashed_messages.html' %}
     <main class="container">{% block main %}{% endblock %}</main>
     <footer class="container">
         Running Simple Surveys, provided by <strong><a href="https://github.com/enchant97">enchant97</a></strong>
