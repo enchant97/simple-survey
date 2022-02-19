@@ -1,5 +1,17 @@
 {% extends "/base.html" %}
-{% block title %}Home{% endblock %}
 {% block main %}
+<div class="text-center">
+    <img class="mb-3" style="max-width: 256px;" src="{{ url_for('static', filename='icon-512.png') }}" alt="app icon">
+    <h1>{{ config.TITLE_NAME }}</h1>
+    <h2>A Fast, Simple Survey Application.</h2>
+    <h3>Features</h3>
+    <ul class="list-group list-group-flush">
+        <li class="list-group-item">Vote on surveys</li>
+        <li class="list-group-item">View & Download analytics</li>
+        <li class="list-group-item">Multiple survey field types</li>
+        <li class="list-group-item">Fast on lower end devices, like a Raspberry Pi</li>
+        <li class="list-group-item">Modern Theme</li>
+    </ul>
+</div>
 
 {% endblock %}

@@ -1,0 +1,14 @@
+{
+    "name": "Simple Surveys. A fast, simple survey application",
+    "short_name": "Simple Surveys",
+    "icons": [
+        {
+            "src": "/static/icon-512.png",
+            "type": "image/png",
+            "sizes": "512x512"
+        }
+    ],
+    "start_url": "/",
+    "display": "minimal-ui",
+    "theme_color": "#0d84bf"
+}
