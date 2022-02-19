@@ -8,3 +8,8 @@ footer {
     border-top-style: solid;
     padding-top: 10px;
 }
+
+.required:after {
+    content:"*";
+    color: var(--bs-red);
+}

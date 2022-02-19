@@ -20,7 +20,8 @@
 </p>
 {% endif %}
 
-<form class="accordion accordion-flush" action="{{ url_for('survey.post_survey_vote', survey_id=survey.id) }}" method="post">
+<form class="accordion accordion-flush" action="{{ url_for('survey.post_survey_vote', survey_id=survey.id) }}"
+    method="post">
     <div aria-label="survey description">
         {% for paragraph in survey.description.split("\n") -%}
         <p>{{ paragraph }}</p>
@@ -29,7 +30,7 @@
 
     {% for field in fields %}
     <fieldset class="mb-2" id="survey-field-{{ field.id }}">
-        <legend>{{ field.caption }}</legend>
+        <legend {% if field.required %}class="required" {% endif %}>{{ field.caption }}</legend>
         {% if field.field_type == FieldTypes.RADIO %}
         {% for option in field.options %}
         <div class="form-check">
