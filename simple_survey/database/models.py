@@ -16,7 +16,7 @@ class Survey(Model):
     Information related to a created survey
     """
     title = CharField(max_length=100)
-    description = CharField(max_length=200)
+    description = CharField(max_length=5000, null=True)
     created_at = DatetimeField(auto_now_add=True)
     closes_at = DatetimeField(null=True)
 

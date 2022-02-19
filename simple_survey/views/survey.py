@@ -228,8 +228,8 @@ async def get_survey_delete(survey_id: int):
 async def post_survey_edit(survey_id: int):
     try:
         form = await request.form
-        title = form["title"]
-        description = form["description"]
+        title = form["title"].strip()
+        description = form["description"].strip()
         closes_at = form.get("closes_at")
 
         if closes_at is not None and closes_at != "":

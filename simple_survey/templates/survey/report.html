@@ -48,7 +48,7 @@
             </tr>
             <tr>
                 <th>Description</th>
-                <td>{{ survey.description }}</td>
+                <td>{{ survey.description | truncate(250, true) }}</td>
             </tr>
             <tr>
                 <th>Closes At</th>

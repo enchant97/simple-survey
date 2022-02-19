@@ -20,8 +20,13 @@
 </p>
 {% endif %}
 
-<form action="{{ url_for('survey.post_survey_vote', survey_id=survey.id) }}" method="post">
-    <p>{{ survey.description }}</p>
+<form class="accordion accordion-flush" action="{{ url_for('survey.post_survey_vote', survey_id=survey.id) }}" method="post">
+    <div aria-label="survey description">
+        {% for paragraph in survey.description.split("\n") -%}
+        <p>{{ paragraph }}</p>
+        {% endfor -%}
+    </div>
+
     {% for field in fields %}
     <fieldset class="mb-2" id="survey-field-{{ field.id }}">
         <legend>{{ field.caption }}</legend>
